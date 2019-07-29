@@ -1,36 +1,19 @@
-// Copyright (c) Microsoft Corporation.
-// All rights reserved.
-//
-// This code is licensed under the MIT License.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files(the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and / or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions :
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.azure.msalwebsample;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.text.ParseException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletResponse;
 
 import com.microsoft.aad.msal4j.*;
+import com.nimbusds.jwt.JWTParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,35 +23,54 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import static com.microsoft.azure.msalwebsample.AuthHelper.getAuthSessionObject;
+
 @Controller
-public class UserController {
+public class AuthPageController {
 
     @Autowired
-    BasicConfiguration configuration;
+    AuthHelper authHelper;
 
-    @RequestMapping("/")
+    @RequestMapping("/msal4jsample")
     public String homepage(){
         return "index";
     }
 
-    @RequestMapping("/graph/users")
-    public ModelAndView getUsersFromGraph(ModelMap model, HttpServletRequest httpRequest) {
+    @RequestMapping("/msal4jsample/secure/aad")
+    public ModelAndView securePage(HttpServletRequest httpRequest) throws ParseException {
+        ModelAndView mav = new ModelAndView("auth_page");
 
-        HttpSession session = httpRequest.getSession();
-        IAuthenticationResult result = (IAuthenticationResult) session.getAttribute(AuthHelper.PRINCIPAL_SESSION_NAME);
+        setAccountInfo(mav, httpRequest);
+
+        return mav;
+    }
+
+    @RequestMapping("/msal4jsample/sign_out")
+    public void signOut(HttpServletRequest httpRequest, HttpServletResponse response) throws ParseException, IOException {
+
+        httpRequest.getSession().invalidate();
+
+        String redirectUrl = "http://localhost:8080/msal4jsample/";
+        response.sendRedirect(AuthHelper.END_SESSION_ENDPOINT +
+                "?post_logout_redirect_uri=" + URLEncoder.encode(redirectUrl, "UTF-8"));
+    }
+
+    @RequestMapping("/graph/users")
+    public ModelAndView getUsersFromGraph(ModelMap model, HttpServletRequest httpRequest) throws Throwable {
+        IAuthenticationResult result =  authHelper.getAuthResultBySilentFlow(httpRequest);
+
         ModelAndView mav;
+
         if (result == null) {
             mav = new ModelAndView("error");
             mav.addObject("error", new Exception("AuthenticationResult not found in session."));
         } else {
-            setUserInfoAndTenant(model, session);
+            mav = new ModelAndView("auth_page");
+            setAccountInfo(mav, httpRequest);
 
             try {
-                String userData = getUserNamesFromGraph(result.accessToken());
+                mav.addObject("users", getUserNamesFromGraph(result.accessToken()));
 
-                mav = new ModelAndView("users");
-                mav.addObject("users", userData);
-                mav.addObject("id_token", result.idToken());
                 return mav;
             } catch (Exception e) {
                 mav = new ModelAndView("error");
@@ -109,10 +111,12 @@ public class UserController {
         return builder.toString();
     }
 
-    private void setUserInfoAndTenant(
-            ModelMap model,
-            HttpSession session){
-        String tenant = session.getServletContext().getInitParameter("tenant");
-        model.addAttribute("tenant", tenant);
+    private void setAccountInfo(ModelAndView model, HttpServletRequest httpRequest) throws ParseException {
+        IAuthenticationResult auth = getAuthSessionObject(httpRequest);
+
+        String tenantId = JWTParser.parse(auth.idToken()).getJWTClaimsSet().getStringClaim("tid");
+
+        model.addObject("tenantId", tenantId);
+        model.addObject("account", getAuthSessionObject(httpRequest).account());
     }
 }
