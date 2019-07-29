@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.azure.msalwebsample;
 
 import lombok.AccessLevel;
@@ -16,14 +19,10 @@ class BasicConfiguration {
     String redirectUri;
     String secretKey;
 
-    String oboClientId;
-    String oboClientSecret;
-
     String getAuthority(){
         if (!authority.endsWith("/")) {
             authority += "/";
         }
         return authority;
     }
-
 }

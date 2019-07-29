@@ -1,25 +1,5 @@
-// Copyright (c) Microsoft Corporation.
-// All rights reserved.
-//
-// This code is licensed under the MIT License.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files(the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and / or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions :
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 package com.microsoft.azure.msalwebsample;
 
@@ -62,14 +42,10 @@ public class AuthFilter implements Filter {
     private static final Integer STATE_TTL = 3600;
     private static final String FAILED_TO_VALIDATE_MESSAGE = "Failed to validate data received from Authorization service - ";
 
-    private List<String> excludedUrls = Collections.singletonList("/");
-    private String clientId;
-    private String clientSecret;
-    private String authority;
-    private String redirectUri;
+    private List<String> excludedUrls = Arrays.asList("/", "/msal4jsample/");
 
     @Autowired
-    BasicConfiguration configuration;
+    AuthHelper authHelper;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
@@ -90,24 +66,22 @@ public class AuthFilter implements Filter {
                 }
                 // check if user has a AuthData in the session
                 if (!AuthHelper.isAuthenticated(httpRequest)) {
-                     if(AuthHelper.containsAuthenticationCode(httpRequest)){
+                    if(AuthHelper.containsAuthenticationCode(httpRequest)){
                         // response should have authentication code, which will be used to acquire access token
                         processAuthenticationCodeRedirect(httpRequest, currentUri, fullUrl);
                     } else {
-                         // not authenticated, redirecting to login.microsoft.com so user can authenticate
+                        // not authenticated, redirecting to login.microsoft.com so user can authenticate
                         sendAuthRedirect(httpRequest, httpResponse);
                         return;
                     }
                 }
-
                 if (isAccessTokenExpired(httpRequest)) {
-                    updateAuthDataUsingSilentFlow(httpRequest);
+                    authHelper.updateAuthDataUsingSilentFlow(httpRequest);
                 }
-
-            } catch (AuthenticationException authException) {
+            } catch (MsalException authException) {
                 // something went wrong (like expiration or revocation of token)
                 // we should invalidate AuthData stored in session and redirect to Authorization server
-                removePrincipalFromSession(httpRequest);
+                authHelper.removePrincipalFromSession(httpRequest);
                 sendAuthRedirect(httpRequest, httpResponse);
                 return;
             } catch (Throwable exc) {
@@ -120,26 +94,9 @@ public class AuthFilter implements Filter {
         chain.doFilter(request, response);
     }
 
-    @Override
-    public void init(FilterConfig config) {
-        clientId = configuration.getClientId();
-        authority = configuration.getAuthority();
-        clientSecret = configuration.getSecretKey();
-        redirectUri = configuration.getRedirectUri();
-    }
-
-    @Override
-    public void destroy() {
-    }
-
     private boolean isAccessTokenExpired(HttpServletRequest httpRequest) {
         IAuthenticationResult result = AuthHelper.getAuthSessionObject(httpRequest);
         return result.expiresOnDate().before(new Date());
-    }
-
-    private void updateAuthDataUsingSilentFlow(HttpServletRequest httpRequest) throws Throwable {
-        IAuthenticationResult authResult = getAuthResultBySilentFlow(httpRequest);
-        setSessionPrincipal(httpRequest, authResult);
     }
 
     private void processAuthenticationCodeRedirect(HttpServletRequest httpRequest, String currentUri, String fullUrl)
@@ -158,14 +115,14 @@ public class AuthFilter implements Filter {
             // validate that OIDC Auth Response matches Code Flow (contains only requested artifacts)
             validateAuthRespMatchesAuthCodeFlow(oidcResponse);
 
-            IAuthenticationResult result = getAuthResultByAuthCode(
+            IAuthenticationResult result = authHelper.getAuthResultByAuthCode(
                     httpRequest,
                     oidcResponse.getAuthorizationCode(),
                     currentUri);
 
             // validate nonce to prevent reply attacks (code maybe substituted to one with broader access)
-            validateNonce(stateData, getClaimValueFromIdToken(result.idToken()));
-            setSessionPrincipal(httpRequest, result);
+            validateNonce(stateData, getNonceClaimValueFromIdToken(result.idToken()));
+            authHelper.setSessionPrincipal(httpRequest, result);
         } else {
             AuthenticationErrorResponse oidcResponse = (AuthenticationErrorResponse) authResponse;
             throw new Exception(String.format("Request for auth code failed: %s - %s",
@@ -185,87 +142,13 @@ public class AuthFilter implements Filter {
         httpResponse.sendRedirect(redirectUrl);
     }
 
-
-    private IAuthenticationResult getAuthResultByAuthCode(
-            HttpServletRequest httpServletRequest,
-            AuthorizationCode authorizationCode,
-            String currentUri) throws Throwable {
-
-        IAuthenticationResult result;
-        ConfidentialClientApplication app;
-        try {
-            app = createClientApplication();
-
-            String authCode = authorizationCode.getValue();
-            AuthorizationCodeParameters parameters = AuthorizationCodeParameters.builder(
-                    authCode,
-                    new URI(currentUri)).
-                    build();
-
-            Future<IAuthenticationResult> future = app.acquireToken(parameters);
-
-            result = future.get();
-        } catch (ExecutionException e) {
-            throw e.getCause();
-        }
-
-        if (result == null) {
-            throw new ServiceUnavailableException("authentication result was null");
-        }
-
-        storeTokenCacheInSession(httpServletRequest, app.tokenCache().serialize());
-
-        return result;
-    }
-
-    private IAuthenticationResult getAuthResultBySilentFlow(HttpServletRequest httpRequest) throws Throwable {
-
-        IAuthenticationResult result =  AuthHelper.getAuthSessionObject(httpRequest);
-
-        IAuthenticationResult updatedResult;
-        ConfidentialClientApplication app;
-        try {
-           app = createClientApplication();
-
-           Object tokenCache =  httpRequest.getSession().getAttribute("token_cache");
-           if(tokenCache != null){
-               app.tokenCache().deserialize(tokenCache.toString());
-           }
-
-            SilentParameters parameters = SilentParameters.builder(
-                    Collections.singleton("https://graph.microsoft.com/.default"),
-                    result.account()).build();
-
-            CompletableFuture<IAuthenticationResult> future = app.acquireTokenSilently(parameters);
-
-            updatedResult = future.get();
-        } catch (ExecutionException e) {
-            throw e.getCause();
-        }
-
-        if (updatedResult == null) {
-            throw new ServiceUnavailableException("authentication result was null");
-        }
-
-        //update session with latest token cache
-        storeTokenCacheInSession(httpRequest, app.tokenCache().serialize());
-
-        return updatedResult;
-    }
-
-    private ConfidentialClientApplication createClientApplication() throws MalformedURLException {
-        return ConfidentialClientApplication.builder(clientId, ClientCredentialFactory.create(clientSecret)).
-                authority(authority).
-                build();
-    }
-
     private void validateNonce(StateData stateData, String nonce) throws Exception {
         if (StringUtils.isEmpty(nonce) || !nonce.equals(stateData.getNonce())) {
             throw new Exception(FAILED_TO_VALIDATE_MESSAGE + "could not validate nonce");
         }
     }
 
-    private String getClaimValueFromIdToken(String idToken) throws ParseException {
+    private String getNonceClaimValueFromIdToken(String idToken) throws ParseException {
         return (String) JWTParser.parse(idToken).getJWTClaimsSet().getClaim("nonce");
     }
 
@@ -284,18 +167,6 @@ public class AuthFilter implements Filter {
                 oidcResponse.getAuthorizationCode() == null) {
             throw new Exception(FAILED_TO_VALIDATE_MESSAGE + "unexpected set of artifacts received");
         }
-    }
-
-    private void setSessionPrincipal(HttpServletRequest httpRequest, IAuthenticationResult result) {
-        httpRequest.getSession().setAttribute(AuthHelper.PRINCIPAL_SESSION_NAME, result);
-    }
-
-    private void storeTokenCacheInSession(HttpServletRequest httpServletRequest, String tokenCache){
-        httpServletRequest.getSession().setAttribute("token_cache", tokenCache);
-    }
-
-    private void removePrincipalFromSession(HttpServletRequest httpRequest) {
-        httpRequest.getSession().removeAttribute(AuthHelper.PRINCIPAL_SESSION_NAME);
     }
 
     private void storeStateInSession(HttpSession session, String state, String nonce) {
@@ -336,13 +207,14 @@ public class AuthFilter implements Filter {
     private String getRedirectUrl(String claims, String state, String nonce)
             throws UnsupportedEncodingException {
 
-        String redirectUrl = authority + "oauth2/v2.0/authorize?" +
+        String redirectUrl = authHelper.getAuthority() + "oauth2/v2.0/authorize?" +
                 "response_type=code&" +
                 "response_mode=form_post&" +
-                "redirect_uri=" + URLEncoder.encode(redirectUri, "UTF-8") +
-                "&client_id=" + clientId +
-                "&scope=" + URLEncoder.encode("openid offline_access profile https://graph.microsoft.com/.default", "UTF-8") +
+                "redirect_uri=" + URLEncoder.encode(authHelper.getRedirectUri(), "UTF-8") +
+                "&client_id=" + authHelper.getClientId() +
+                "&scope=" + URLEncoder.encode("openid offline_access profile", "UTF-8") +
                 (StringUtils.isEmpty(claims) ? "" : "&claims=" + claims) +
+                "&prompt=select_account" +
                 "&state=" + state
                 + "&nonce=" + nonce;
 
