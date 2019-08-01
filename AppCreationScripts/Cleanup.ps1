@@ -50,7 +50,7 @@ This function removes the Azure AD applications for the sample. These applicatio
     Write-Host "Cleaning-up applications from tenant '$tenantName'"
 
     Write-Host "Removing 'java-web-app' if needed"
-    $app=Get-AzureADApplication -Filter "DisplayName eq 'MyWebApp'"  
+    $app=Get-AzureADApplication -Filter "DisplayName eq 'java-webapp'"  
 
     if ($app)
     {
