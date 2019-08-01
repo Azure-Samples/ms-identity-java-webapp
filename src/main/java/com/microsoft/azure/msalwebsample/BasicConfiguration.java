@@ -9,6 +9,10 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+/**
+ * Object containing configuration data for the application. Spring will automatically wire the
+ * values by grabbing them from application.properties file
+ */
 @Getter
 @Setter
 @Component
@@ -16,7 +20,8 @@ import org.springframework.stereotype.Component;
 class BasicConfiguration {
     String clientId;
     @Getter(AccessLevel.NONE) String authority;
-    String redirectUri;
+    String redirectUriSignin;
+    String redirectUriGraphUsers;
     String secretKey;
 
     String getAuthority(){
