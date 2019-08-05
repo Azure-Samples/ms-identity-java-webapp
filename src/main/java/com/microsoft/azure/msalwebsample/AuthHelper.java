@@ -3,37 +3,54 @@
 
 package com.microsoft.azure.msalwebsample;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.text.ParseException;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import javax.annotation.PostConstruct;
 import javax.naming.ServiceUnavailableException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.microsoft.aad.msal4j.*;
+import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.oauth2.sdk.AuthorizationCode;
+import com.nimbusds.openid.connect.sdk.AuthenticationErrorResponse;
 import com.nimbusds.openid.connect.sdk.AuthenticationResponse;
+import com.nimbusds.openid.connect.sdk.AuthenticationResponseParser;
 import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static com.microsoft.azure.msalwebsample.SessionManagementHelper.FAILED_TO_VALIDATE_MESSAGE;
+
+/**
+ * Helpers for acquiring authorization codes and tokens from AAD
+ */
 @Component
 @Getter
 class AuthHelper {
 
     static final String PRINCIPAL_SESSION_NAME = "principal";
     static final String TOKEN_CACHE_SESSION_ATTRIBUTE = "token_cache";
-    static final String END_SESSION_ENDPOINT = "https://login.microsoftonline.com/common/oauth2/v2.0/logout";
 
     private String clientId;
     private String clientSecret;
     private String authority;
-    private String redirectUri;
+    private String redirectUriSignIn;
+    private String redirectUriGraphUsers;
 
     @Autowired
     BasicConfiguration configuration;
@@ -43,50 +60,120 @@ class AuthHelper {
         clientId = configuration.getClientId();
         authority = configuration.getAuthority();
         clientSecret = configuration.getSecretKey();
-        redirectUri = configuration.getRedirectUri();
+        redirectUriSignIn = configuration.getRedirectUriSignin();
+        redirectUriGraphUsers = configuration.getRedirectUriGraphUsers();
     }
 
-    private ConfidentialClientApplication createClientApplication() throws MalformedURLException {
-        return ConfidentialClientApplication.builder(clientId, ClientCredentialFactory.create(clientSecret)).
-                authority(authority).
-                build();
+    void processAuthenticationCodeRedirect(HttpServletRequest httpRequest, String currentUri, String fullUrl)
+            throws Throwable {
+
+        Map<String, List<String>> params = new HashMap<>();
+        for (String key : httpRequest.getParameterMap().keySet()) {
+            params.put(key, Collections.singletonList(httpRequest.getParameterMap().get(key)[0]));
+        }
+        // validate that state in response equals to state in request
+        StateData stateData = SessionManagementHelper.validateState(httpRequest.getSession(), params.get(SessionManagementHelper.STATE).get(0));
+
+        AuthenticationResponse authResponse = AuthenticationResponseParser.parse(new URI(fullUrl), params);
+        if (AuthHelper.isAuthenticationSuccessful(authResponse)) {
+            AuthenticationSuccessResponse oidcResponse = (AuthenticationSuccessResponse) authResponse;
+            // validate that OIDC Auth Response matches Code Flow (contains only requested artifacts)
+            validateAuthRespMatchesAuthCodeFlow(oidcResponse);
+
+            IAuthenticationResult result = getAuthResultByAuthCode(
+                    httpRequest,
+                    oidcResponse.getAuthorizationCode(),
+                    currentUri);
+
+            // validate nonce to prevent reply attacks (code maybe substituted to one with broader access)
+            validateNonce(stateData, getNonceClaimValueFromIdToken(result.idToken()));
+            SessionManagementHelper.setSessionPrincipal(httpRequest, result);
+        } else {
+            AuthenticationErrorResponse oidcResponse = (AuthenticationErrorResponse) authResponse;
+            throw new Exception(String.format("Request for auth code failed: %s - %s",
+                    oidcResponse.getErrorObject().getCode(),
+                    oidcResponse.getErrorObject().getDescription()));
+        }
     }
 
-    IAuthenticationResult getAuthResultBySilentFlow(HttpServletRequest httpRequest) throws Throwable {
-        IAuthenticationResult result =  AuthHelper.getAuthSessionObject(httpRequest);
+    IAuthenticationResult getAuthResultBySilentFlow(HttpServletRequest httpRequest, HttpServletResponse httpResponse)
+            throws Throwable {
 
-        IAuthenticationResult updatedResult;
-        ConfidentialClientApplication app;
-        try {
-            app = createClientApplication();
+        IAuthenticationResult result =  SessionManagementHelper.getAuthSessionObject(httpRequest);
 
-            Object tokenCache =  httpRequest.getSession().getAttribute("token_cache");
-            if(tokenCache != null){
-                app.tokenCache().deserialize(tokenCache.toString());
-            }
+        IConfidentialClientApplication app = createClientApplication();
 
-            SilentParameters parameters = SilentParameters.builder(
-                    Collections.singleton("https://graph.microsoft.com/.default"),
-                    result.account()).build();
-
-            CompletableFuture<IAuthenticationResult> future = app.acquireTokenSilently(parameters);
-
-            updatedResult = future.get();
-        } catch (ExecutionException e) {
-            throw e.getCause();
+        Object tokenCache = httpRequest.getSession().getAttribute("token_cache");
+        if (tokenCache != null) {
+            app.tokenCache().deserialize(tokenCache.toString());
         }
 
-        if (updatedResult == null) {
-            throw new ServiceUnavailableException("authentication result was null");
-        }
+        SilentParameters parameters = SilentParameters.builder(
+                Collections.singleton("User.ReadBasic.All"),
+                result.account()).build();
+
+        CompletableFuture<IAuthenticationResult> future = app.acquireTokenSilently(parameters);
+        IAuthenticationResult updatedResult = future.get();
 
         //update session with latest token cache
-        storeTokenCacheInSession(httpRequest, app.tokenCache().serialize());
+        SessionManagementHelper.storeTokenCacheInSession(httpRequest, app.tokenCache().serialize());
 
         return updatedResult;
     }
 
-    IAuthenticationResult getAuthResultByAuthCode(
+    private void validateNonce(StateData stateData, String nonce) throws Exception {
+        if (StringUtils.isEmpty(nonce) || !nonce.equals(stateData.getNonce())) {
+            throw new Exception(FAILED_TO_VALIDATE_MESSAGE + "could not validate nonce");
+        }
+    }
+
+    private String getNonceClaimValueFromIdToken(String idToken) throws ParseException {
+        return (String) JWTParser.parse(idToken).getJWTClaimsSet().getClaim("nonce");
+    }
+
+    private void validateAuthRespMatchesAuthCodeFlow(AuthenticationSuccessResponse oidcResponse) throws Exception {
+        if (oidcResponse.getIDToken() != null || oidcResponse.getAccessToken() != null ||
+                oidcResponse.getAuthorizationCode() == null) {
+            throw new Exception(FAILED_TO_VALIDATE_MESSAGE + "unexpected set of artifacts received");
+        }
+    }
+
+    void sendAuthRedirect(HttpServletRequest httpRequest, HttpServletResponse httpResponse, String scope, String redirectURL)
+            throws IOException {
+
+        // state parameter to validate response from Authorization server and nonce parameter to validate idToken
+        String state = UUID.randomUUID().toString();
+        String nonce = UUID.randomUUID().toString();
+        SessionManagementHelper.storeStateAndNonceInSession(httpRequest.getSession(), state, nonce);
+
+        httpResponse.setStatus(302);
+        String redirectUrl = getRedirectUrl(httpRequest.getParameter("claims"), scope, redirectURL, state, nonce);
+        httpResponse.sendRedirect(redirectUrl);
+    }
+
+    String getRedirectUrl(String claims, String scope, String registeredRedirectURL, String state, String nonce)
+            throws UnsupportedEncodingException {
+
+        String urlEncodedScopes = scope == null ?
+                URLEncoder.encode("openid offline_access profile", "UTF-8") :
+                URLEncoder.encode("openid offline_access profile" + " " + scope, "UTF-8");
+
+
+        String redirectUrl = authority + "oauth2/v2.0/authorize?" +
+                "response_type=code&" +
+                "response_mode=form_post&" +
+                "redirect_uri=" +  URLEncoder.encode(registeredRedirectURL, "UTF-8") +
+                "&client_id=" + clientId +
+                "&scope=" + urlEncodedScopes +
+                (StringUtils.isEmpty(claims) ? "" : "&claims=" + claims) +
+                "&prompt=select_account" +
+                "&state=" + state
+                + "&nonce=" + nonce;
+
+        return redirectUrl;
+    }
+
+    private IAuthenticationResult getAuthResultByAuthCode(
             HttpServletRequest httpServletRequest,
             AuthorizationCode authorizationCode,
             String currentUri) throws Throwable {
@@ -113,53 +200,18 @@ class AuthHelper {
             throw new ServiceUnavailableException("authentication result was null");
         }
 
-        storeTokenCacheInSession(httpServletRequest, app.tokenCache().serialize());
+        SessionManagementHelper.storeTokenCacheInSession(httpServletRequest, app.tokenCache().serialize());
 
         return result;
     }
 
-    private void storeTokenCacheInSession(HttpServletRequest httpServletRequest, String tokenCache){
-        httpServletRequest.getSession().setAttribute(AuthHelper.TOKEN_CACHE_SESSION_ATTRIBUTE, tokenCache);
+    private ConfidentialClientApplication createClientApplication() throws MalformedURLException {
+        return ConfidentialClientApplication.builder(clientId, ClientCredentialFactory.create(clientSecret)).
+                authority(authority).
+                build();
     }
 
-    void setSessionPrincipal(HttpServletRequest httpRequest, IAuthenticationResult result) {
-        httpRequest.getSession().setAttribute(AuthHelper.PRINCIPAL_SESSION_NAME, result);
-    }
-
-    void removePrincipalFromSession(HttpServletRequest httpRequest) {
-        httpRequest.getSession().removeAttribute(AuthHelper.PRINCIPAL_SESSION_NAME);
-    }
-
-    void updateAuthDataUsingSilentFlow(HttpServletRequest httpRequest) throws Throwable {
-        IAuthenticationResult authResult = getAuthResultBySilentFlow(httpRequest);
-        setSessionPrincipal(httpRequest, authResult);
-    }
-
-    static boolean isAuthenticationSuccessful(AuthenticationResponse authResponse) {
+    private static boolean isAuthenticationSuccessful(AuthenticationResponse authResponse) {
         return authResponse instanceof AuthenticationSuccessResponse;
-    }
-
-    static boolean isAuthenticated(HttpServletRequest request) {
-        return request.getSession().getAttribute(PRINCIPAL_SESSION_NAME) != null;
-    }
-
-    static IAuthenticationResult getAuthSessionObject(HttpServletRequest request) {
-        Object principalSession = request.getSession().getAttribute(PRINCIPAL_SESSION_NAME);
-        if(principalSession instanceof IAuthenticationResult){
-            return (IAuthenticationResult) principalSession;
-        } else {
-            throw new IllegalStateException();
-        }
-    }
-
-    static boolean containsAuthenticationCode(HttpServletRequest httpRequest) {
-        Map<String, String[]> httpParameters = httpRequest.getParameterMap();
-
-        boolean isPostRequest = httpRequest.getMethod().equalsIgnoreCase("POST");
-        boolean containsErrorData = httpParameters.containsKey("error");
-        boolean containIdToken = httpParameters.containsKey("id_token");
-        boolean containsCode = httpParameters.containsKey("code");
-
-        return isPostRequest && containsErrorData || containsCode || containIdToken;
     }
 }

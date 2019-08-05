@@ -1,3 +1,10 @@
+[CmdletBinding()]
+param(
+    [PSCredential] $Credential,
+    [Parameter(Mandatory=$False, HelpMessage='Tenant ID (This is a GUID which represents the "Directory ID" of the AzureAD tenant into which you want to create the apps')]
+    [string] $tenantId
+)
+
 <#
  This script creates the Azure AD applications needed for this sample and updates the configuration files
  for the visual Studio projects from the data in the Azure AD applications.
@@ -101,15 +108,7 @@ Function ConfigureApplications
    configuration files in the client and service project  of the visual studio solution (App.Config and Web.Config)
    so that they are consistent with the Applications parameters
 #> 
-    [CmdletBinding()]
-    param(
-        [PSCredential] $Credential,
-        [Parameter(HelpMessage='Tenant ID (This is a GUID which represents the "Directory ID" of the AzureAD tenant into which you want to create the apps')]
-        [string] $tenantId
-    )
 
-   process
-   {
     # $tenantId is the Active Directory Tenant. This is a GUID which represents the "Directory ID" of the AzureAD tenant
     # into which you want to create the apps. Look it up in the Azure portal in the "Properties" of the Azure AD.
 
@@ -135,52 +134,77 @@ Function ConfigureApplications
     {
         $tenantId = $creds.Tenant.Id
     }
+
     $tenant = Get-AzureADTenantDetail
     $tenantName =  ($tenant.VerifiedDomains | Where { $_._Default -eq $True }).Name
 
-   # Create the app AAD application
-   Write-Host "Creating the AAD appplication (msal-web-sample)"
-   # Get a 2 years application key for the app Application
+    # Get the user running the script
+    $user = Get-AzureADUser -ObjectId $creds.Account.Id
+
+   # Create the webapp AAD application
+   Write-Host "Creating the AAD application (java-web-app)"
+   # Get a 2 years application key for the webapp Application
    $pw = ComputePassword
    $fromDate = [DateTime]::Now;
    $key = CreateAppKey -fromDate $fromDate -durationInYears 2 -pw $pw
-   $appAppKey = $pw
-   $appAadApplication = New-AzureADApplication -DisplayName "msal-web-sample" `
-                                               -HomePage "https://localhost:8080/" `
-											   -ReplyUrls "http://localhost:8080/graph/users" `
-                                               -IdentifierUris "https://$tenantName/msal-web-sample" `
-                                               -PasswordCredentials $key `
-                                               -PublicClient $False
+   Write-Host "key: " $key
+   $webappAppKey = $pw
+   $webappAadApplication = New-AzureADApplication -DisplayName "java-web-app" `
+                                                  -LogoutUrl "http://localhost:44321/signout-oidc" `
+                                                  -ReplyUrls "http://localhost:8080/msal4jsample/secure/aad", "http://localhost:8080/msal4jsample/graph/users" `
+                                                  -IdentifierUris "https://$tenantName/java-web-app" `
+                                                  -AvailableToOtherTenants $True `
+                                                  -PasswordCredentials $key `
+                                                  -Oauth2AllowImplicitFlow $true `
+                                                  -PublicClient $False
 
+   $currentAppId = $webappAadApplication.AppId
+   $webappServicePrincipal = New-AzureADServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
 
-   $currentAppId = $appAadApplication.AppId
-   $appServicePrincipal = New-AzureADServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
-   Write-Host "Done."
+   # add the user running the script as an app owner if needed
+   $owner = Get-AzureADApplicationOwner -ObjectId $webappAadApplication.ObjectId
+   if ($owner -eq $null)
+   { 
+    Add-AzureADApplicationOwner -ObjectId $webappAadApplication.ObjectId -RefObjectId $user.ObjectId
+    Write-Host "'$($user.UserPrincipalName)' added as an application owner to app '$($webappServicePrincipal.DisplayName)'"
+   }
+
+   Write-Host "Done creating the webapp application (java-web-app)"
 
    # URL of the AAD application in the Azure portal
-   $appPortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_IAM/ApplicationBlade/appId/"+$appAadApplication.AppId+"/objectId/"+$appAadApplication.ObjectId
-   Add-Content -Value "<tr><td>app</td><td>$currentAppId</td><td><a href='$appPortalUrl'>Webapp-Openidconnect</a></td></tr>" -Path createdApps.html
+   # Future? $webappPortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/"+$webappAadApplication.AppId+"/objectId/"+$webappAadApplication.ObjectId+"/isMSAApp/"
+   $webappPortalUrl = "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/CallAnAPI/appId/"+$webappAadApplication.AppId+"/objectId/"+$webappAadApplication.ObjectId+"/isMSAApp/"
+   Add-Content -Value "<tr><td>webapp</td><td>$currentAppId</td><td><a href='$webappPortalUrl'>java-web-app</a></td></tr>" -Path createdApps.html
 
    $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
-   # Add Required Resources Access (from 'app' to 'Microsoft Graph')
-   Write-Host "Getting access from 'app' to 'Microsoft Graph'"
+
+   # Add Required Resources Access (from 'webapp' to 'Microsoft Graph')
+   Write-Host "Getting access from 'java-web-app' to 'Microsoft Graph'"
    $requiredPermissions = GetRequiredPermissions -applicationDisplayName "Microsoft Graph" `
-                                                 -requiredDelegatedPermissions "Directory.Read.All";
+                                                -requiredDelegatedPermissions "User.Read|User.ReadBasic.All" `
+
    $requiredResourcesAccess.Add($requiredPermissions)
-   Set-AzureADApplication -ObjectId $appAadApplication.ObjectId -RequiredResourceAccess $requiredResourcesAccess
-   Write-Host "Granted."
+
+
+   Set-AzureADApplication -ObjectId $webappAadApplication.ObjectId -RequiredResourceAccess $requiredResourcesAccess
+   Write-Host "Granted permissions."
    Write-Host ""
    Write-Host "IMPORTANT: Think of completing the following manual step(s) in the Azure portal":
    Write-Host "- For 'app'"
    Write-Host "  - Open src/main/java/resources/application.properties and replace the following values:"
    Write-Host "  - 'YOUR_TENANT_NAME' with $tenantName"
    Write-Host "  - 'YOUR_CLIENT_ID' with $currentAppId"
-   Write-Host "  - 'YOUR_CLIENT_SECRET' with $appAppKey"
+   Write-Host "  - 'YOUR_CLIENT_SECRET' with $webappAppKey"
    Add-Content -Value "</tbody></table></body></html>" -Path createdApps.html
 
-  }
+   Add-Content -Value "</tbody></table></body></html>" -Path createdApps.html  
 }
 
+# Pre-requisites
+if ((Get-Module -ListAvailable -Name "AzureAD") -eq $null) { 
+    Install-Module "AzureAD" -Scope CurrentUser 
+} 
+Import-Module AzureAD
 
 # Run interactively (will ask you for the tenant ID)
 ConfigureApplications -Credential $Credential -tenantId $TenantId

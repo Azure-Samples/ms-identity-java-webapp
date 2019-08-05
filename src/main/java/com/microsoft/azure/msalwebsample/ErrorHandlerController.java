@@ -11,6 +11,9 @@ import org.springframework.boot.web.servlet.error.ErrorController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * Endpoint where errors will be redirected
+ */
 @Controller
 public class ErrorHandlerController implements ErrorController {
 

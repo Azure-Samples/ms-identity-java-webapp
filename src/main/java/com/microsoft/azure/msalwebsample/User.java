@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.json.JSONObject;
 
+/**
+ * User object model
+ */
 @Getter
 @Setter
 public class User {

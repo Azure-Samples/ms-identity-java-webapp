@@ -1,0 +1,30 @@
+{
+  "Sample": {
+    "RepositoryUrl": "https://github.com/AzureSamples/ms-identity-java-webapp",
+    "Title": "Integrating Azure AD into a Java web application",
+    "Level": 300,
+    "Service": "Java Web Application",
+    "Endpoint": "Microsoft identity platform (formerly Azure AD v2.0)"
+  },
+  "AADApps": [
+    {
+      "Id": "java-webapp",
+      "Name": "java-webapp",
+      "Kind": "WebApp", /* SinglePageApplication, WebApp, Mobile, UWP, Desktop, Daemon, WebApi, Browserless */
+      "Audience": "AzureADandPersonalMicrosoftAccount", /* AzureADMyOrg, AzureADMultipleOrgs, AzureADandPersonalMicrosoftAccount, PersonalMicrosoftAccount */
+      "PasswordCredentials": "Auto",
+      "RequiredResourcesAccess": [
+        {
+          "Resource": "Microsoft Graph",
+          "DelegatedPermissions": [
+            "User.Read",
+            "User.ReadBasic.All"
+          ]
+        }
+      ],
+      "ReplyUrls": "https://localhost:8080/msal4jsample/secure/aad, https://localhost:8080/msal4jsample/graph/users",
+      "LogoutUrl": "https://localhost:8080/msal4jsample/sign-out"
+    }
+  ],
+  "CodeConfiguration": []
+}
