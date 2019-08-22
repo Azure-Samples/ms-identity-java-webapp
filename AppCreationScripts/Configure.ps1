@@ -192,7 +192,7 @@ Function ConfigureApplications
    Write-Host "IMPORTANT: Think of completing the following manual step(s) in the Azure portal":
    Write-Host "- For 'app'"
    Write-Host "  - Open src/main/java/resources/application.properties and replace the following values:"
-   Write-Host "  - 'Enter_the_Tenant_Name_Here' with $tenantName"
+   Write-Host "  - 'Enter_the_Tenant_Info_Here' with $tenantName"
    Write-Host "  - 'Enter_the_Application_Id_here' with $currentAppId"
    Write-Host "  - 'Enter_the_Client_Secret_Here' with $webappAppKey"
    Add-Content -Value "</tbody></table></body></html>" -Path createdApps.html
