@@ -107,8 +107,8 @@ Click on **save**.
 ### Step 4:  Configure the sample to use your Azure AD tenant
 
 Open `application.properties` in the src/main/resources folder. Fill in with your tenant and app registration information 
-noted in registration step. Replace YOUR_TENANT_NAME with the tenant id, YOUR_CLIENT_ID with the Application Id and 
-YOUR_CLIENT_SECRET with the key value noted.
+noted in registration step. Replace *Enter_the_Tenant_Info_Here* with the tenant id, *Enter_the_Application_Id_here* with the Application Id and 
+*Enter_the_Client_Secret_Here* with the key value noted.
 
 If you did not use the  default redirect URIs, then you'll have to update `aad.redirectUriSignin` and 
 `aad.redirectUriGraphUsers` as well with the registered redirect URIs. 
