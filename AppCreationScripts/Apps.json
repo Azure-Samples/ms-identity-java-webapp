@@ -1,0 +1,46 @@
+{
+  "Sample": {
+    "Title": "Integrating Azure AD into a Java web application",
+    "Level": 400,
+    "Client": "Java, MSAL4J"
+  },
+  "AppRegistrations": [
+    {
+      "x-ms-id": "JavaWebApp",
+      "x-ms-name": "ms-identity-java-webapp",
+      "x-ms-version": "2.0",
+      "logoutUrl":  "https://localhost:8080/msal4jsample/sign-out",
+      "replyUrlsWithType": [
+        {
+          "url": "https://localhost:8080/msal4jsample/secure/aad",
+          "type": "Web"
+        } ,
+        {
+          "url": "https://localhost:8080/msal4jsample/graph/users",
+          "type": "Web"
+        }
+      ],
+      "x-ms-passwordCredentials": "Auto",
+      "oauth2AllowImplicitFlow": false,
+      "oauth2AllowIdTokenImplicitFlow": false,
+      "requiredResourceAccess": [
+        {
+          "x-ms-resourceAppName": "Microsoft Graph",
+          "resourceAppId": "00000003-0000-0000-c000-000000000000",
+          "resourceAccess": [
+            {
+              "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+              "type": "Scope",
+              "x-ms-name": "user.read"
+            },
+            {
+              "id": "b340eb25-3456-403f-be2f-af7a0d370277",
+              "type": "Scope",
+              "x-ms-name": "User.ReadBasic.All"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
