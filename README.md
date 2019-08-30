@@ -12,6 +12,8 @@ endpoint: AAD V2
 
 ## About this sample
 
+> This sample is also available as a quickstart for the Microsoft identity platform: [Quickstart: Add sign-in with Microsoft to a Java web app](https://docs.microsoft.com/azure/active-directory/develop/quickstart-v2-java-webapp)
+
 ### Overview
 
 This sample demonstrates a Java web application calling a Microsoft Graph that is secured using Azure Active Directory.
@@ -20,8 +22,7 @@ This sample demonstrates a Java web application calling a Microsoft Graph that i
     - Id Token from Azure Active Directory (Azure AD) to sign in an user 
     - Access token that is used as a bearer token when calling the Microsoft Graph to get information from users in a tenant.
 
-![Topology](./ReadmeFiles/Java-WebApp-Diagram.png)
-
+   ![Topology](./ReadmeFiles/Java-WebApp-Diagram.png)
 
 ### Scenario
 
@@ -54,7 +55,7 @@ To register these projects, you can:
 - or use PowerShell scripts that:
   - **automatically** create for you the Azure AD applications and related objects (passwords, permissions, dependencies)
 
-If you want to use this automation, read the instructions in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md). Please note that the configuration of your code (Step 4) still needs to be done manually. 
+If you want to use this automation, read the instructions in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md). Please note that the configuration of your code (Step 4) still needs to be done manually.
 
 #### First step: choose the Azure AD tenant where you want to create your applications
 
@@ -67,7 +68,7 @@ application, from the *Favorites* or *All Directories* list.
 1. Click on **All services** in the left-hand nav, and choose **Azure Active Directory**.
 
 > In the next steps, you might need the tenant name (or directory name) or the tenant ID (or directory ID). These are 
-presented in the **Properties**of the Azure Active Directory window respectively as *Name* and *Directory ID*
+presented in the **Properties** of the Azure Active Directory window respectively as *Name* and *Directory ID*
 
 #### Register the app app (Webapp-Openidconnect)
 
@@ -84,13 +85,12 @@ and personal Microsoft Accounts (e.g. Skype, Xbox, Outlook.com)"
  two different redirect URIs: one for the signIn page, and one for the graph users page. For both, you should use the same
  host and port number, then followed by "/msal4jsample/secure/aad" for the sign in page and 
  "msal4jsample/graph/users" for the users page.
-  
- By default, the sample uses: 
- 
+  By default, the sample uses: 
+
     - `http://localhost:8080/msal4jsample/secure/aad`. 
     - `http://localhost:8080/msal4jsample/graph/users`
 
-Click on **save**. 
+Click on **save**.
 1. On the left hand menu, choose **Certificates & Secrets** and click on `New client secret` in the **Client Secrets** section:
 
    - Type a key description (of instance `app secret`),
@@ -132,38 +132,40 @@ If you would like to deploy the web sample to Tomcat, you will need to make a co
 
 1. Open msal-web-sample/pom.xml
     - Under `<name>msal-web-sample</name>` add `<packaging>war</packaging>`
-    - Add dependency 
-    ```
-    		<dependency>
-    			<groupId>org.springframework.boot</groupId>
-    			<artifactId>spring-boot-starter-tomcat</artifactId>
-    			<scope>provided</scope>
-    		</dependency>
-   ```
+    - Add dependency:
+         ```xml
+         <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-tomcat</artifactId>
+          <scope>provided</scope>
+         </dependency>
+         ```
 
 2. Open msal-web-sample/src/main/java/com.microsoft.azure.msalwebsample/MsalWebSampleApplication
  - Delete all source code and replace with 
- ```
- package com.microsoft.azure.msalwebsample;
-    
+ 
+   ```Java
+    package com.microsoft.azure.msalwebsample;
+
     import org.springframework.boot.SpringApplication;
     import org.springframework.boot.autoconfigure.SpringBootApplication;
     import org.springframework.boot.builder.SpringApplicationBuilder;
     import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-    
+
     @SpringBootApplication
     public class MsalWebSampleApplication extends SpringBootServletInitializer {
-    
+
     	public static void main(String[] args) {
     		SpringApplication.run(MsalWebSampleApplication.class, args);
     	}
-    
+
     	@Override
     	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
     		return builder.sources(MsalWebSampleApplication.class);
     	}
     } 
-```
+ 
+   ```
 
 3. Open a command prompt, go to the root folder of the project, and run `mvn package`
     - This will generate a `msal-web-sample-0.1.0.war` file in your /targets directory. 
@@ -203,5 +205,7 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 ## More information
 
 For more information, see MSAL4J [conceptual documentation](https://github.com/AzureAD/azure-activedirectory-library-for-java/wiki)
+
+For more information about web apps scenarios on the Microsoft identity platform see [Scenario: Web app that signs in users](https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-web-app-sign-user-overview) and [Scenario: Web app that calls web APIs](https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-web-app-call-api-overview)
 
 For more information about how OAuth 2.0 protocols work in this scenario and other scenarios, see [Authentication Scenarios for Azure AD](http://go.microsoft.com/fwlink/?LinkId=394414).
