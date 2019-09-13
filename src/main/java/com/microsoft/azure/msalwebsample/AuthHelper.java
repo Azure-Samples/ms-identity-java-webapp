@@ -147,11 +147,11 @@ class AuthHelper {
         SessionManagementHelper.storeStateAndNonceInSession(httpRequest.getSession(), state, nonce);
 
         httpResponse.setStatus(302);
-        String redirectUrl = getRedirectUrl(httpRequest.getParameter("claims"), scope, redirectURL, state, nonce);
-        httpResponse.sendRedirect(redirectUrl);
+        String authorizationCodeUrl = getAuthorizationCodeUrl(httpRequest.getParameter("claims"), scope, redirectURL, state, nonce);
+        httpResponse.sendRedirect(authorizationCodeUrl);
     }
 
-    String getRedirectUrl(String claims, String scope, String registeredRedirectURL, String state, String nonce)
+    String getAuthorizationCodeUrl(String claims, String scope, String registeredRedirectURL, String state, String nonce)
             throws UnsupportedEncodingException {
 
         String urlEncodedScopes = scope == null ?
@@ -159,7 +159,7 @@ class AuthHelper {
                 URLEncoder.encode("openid offline_access profile" + " " + scope, "UTF-8");
 
 
-        String redirectUrl = authority + "oauth2/v2.0/authorize?" +
+        String authorizationCodeUrl = authority + "oauth2/v2.0/authorize?" +
                 "response_type=code&" +
                 "response_mode=form_post&" +
                 "redirect_uri=" +  URLEncoder.encode(registeredRedirectURL, "UTF-8") +
@@ -170,7 +170,7 @@ class AuthHelper {
                 "&state=" + state
                 + "&nonce=" + nonce;
 
-        return redirectUrl;
+        return authorizationCodeUrl;
     }
 
     private IAuthenticationResult getAuthResultByAuthCode(
