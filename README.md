@@ -1,11 +1,13 @@
 ---
-services: active-directory
-platforms: Java
-author: sagonzal, Pesomka
-level: 300
-client: Java web application
-service: Microsoft Graph
-endpoint: AAD V2
+page_type: sample
+languages:
+- java
+- powershell
+- html
+products:
+- azure
+description: "This sample demonstrates a Java web application calling a Microsoft Graph that is secured using Azure Active Directory."
+urlFragment: ms-identity-java-webapp
 ---
 
 # Integrating Azure AD into a Java web application
