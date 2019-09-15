@@ -21,12 +21,11 @@ urlFragment: ms-identity-java-webapp
 This sample demonstrates a Java web application calling a Microsoft Graph that is secured using Azure Active Directory.
 
 1. The Java web application uses the Microsoft Authentication Library for Java (MSAL4J) to obtain an:
-    - Id Token from Azure Active Directory (Azure AD) to sign in an user 
-    - Access token that is used as a bearer token when calling the Microsoft Graph to get information from users in a tenant.
 
-     <img alt="Topology" src="./ReadmeFiles/https://github.com/Azure-Samples/ms-identity-java-webapp/blob/master/ReadmeFiles/Java-WebApp-Diagram.png" width="50%"/>
+   - Id Token from Azure Active Directory (Azure AD) to sign in an user 
+   - Access token that is used as a bearer token when calling the Microsoft Graph to get information from users in a tenant.
 
-<!--  <img alt="Topology" src="./ReadmeFiles/Java-WebApp-Diagram.png" width="50%"/>  -->
+     ![Topology](./ReadmeFiles/Java-WebApp-Diagram.png)
 
 ### Scenario
 
