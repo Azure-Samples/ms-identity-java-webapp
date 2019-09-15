@@ -10,7 +10,7 @@ description: "This sample demonstrates a Java web application calling a Microsof
 urlFragment: ms-identity-java-webapp
 ---
 
-# Integrating Azure AD into a Java web application
+# A Java Web application that signs in users with the Microsoft identity platform and calls Microsoft Graph
 
 ## About this sample
 
