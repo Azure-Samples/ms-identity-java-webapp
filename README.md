@@ -24,7 +24,9 @@ This sample demonstrates a Java web application calling a Microsoft Graph that i
     - Id Token from Azure Active Directory (Azure AD) to sign in an user 
     - Access token that is used as a bearer token when calling the Microsoft Graph to get information from users in a tenant.
 
-   <img alt="Topology" src="./ReadmeFiles/Java-WebApp-Diagram.png" width="50%"/>
+     <img alt="Topology" src="./ReadmeFiles/https://github.com/Azure-Samples/ms-identity-java-webapp/blob/master/ReadmeFiles/Java-WebApp-Diagram.png" width="50%"/>
+
+<!--  <img alt="Topology" src="./ReadmeFiles/Java-WebApp-Diagram.png" width="50%"/>  -->
 
 ### Scenario
 
