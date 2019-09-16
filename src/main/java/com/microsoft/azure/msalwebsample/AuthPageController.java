@@ -77,14 +77,14 @@ public class AuthPageController {
 
                 SessionManagementHelper.storeStateAndNonceInSession(httpRequest.getSession(), state, nonce);
 
-                String redirectUrl = authHelper.getRedirectUrl(
+                String authorizationCodeUrl = authHelper.getAuthorizationCodeUrl(
                         httpRequest.getParameter("claims"),
                         "User.ReadBasic.all",
                         authHelper.getRedirectUriGraphUsers(),
                         state,
                         nonce);
 
-                return new ModelAndView("redirect:" + redirectUrl);
+                return new ModelAndView("redirect:" + authorizationCodeUrl);
             } else {
 
                 mav = new ModelAndView("error");
