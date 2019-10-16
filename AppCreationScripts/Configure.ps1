@@ -151,7 +151,7 @@ Function ConfigureApplications
    $webappAppKey = $pw
    $webappAadApplication = New-AzureADApplication -DisplayName "java-web-app" `
                                                   -LogoutUrl "http://localhost:44321/signout-oidc" `
-                                                  -ReplyUrls "http://localhost:8080/msal4jsample/secure/aad", "http://localhost:8080/msal4jsample/graph/me" `
+                                                  -ReplyUrls "http://localhost:8080/msal4jsample/secure/aad", "http://localhost:8080/msal4jsample/graph/users" `
                                                   -IdentifierUris "https://$tenantName/java-web-app" `
                                                   -AvailableToOtherTenants $True `
                                                   -PasswordCredentials $key `
@@ -181,7 +181,7 @@ Function ConfigureApplications
    # Add Required Resources Access (from 'webapp' to 'Microsoft Graph')
    Write-Host "Getting access from 'java-web-app' to 'Microsoft Graph'"
    $requiredPermissions = GetRequiredPermissions -applicationDisplayName "Microsoft Graph" `
-                                                -requiredDelegatedPermissions "User.Read" `
+                                                -requiredDelegatedPermissions "User.Read|User.ReadBasic.All" `
 
    $requiredResourcesAccess.Add($requiredPermissions)
 

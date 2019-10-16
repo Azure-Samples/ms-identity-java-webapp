@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.microsoft.aad.msal4j.*;
 import com.nimbusds.jwt.JWTParser;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -58,8 +59,8 @@ public class AuthPageController {
                 URLEncoder.encode(redirectUrl, "UTF-8"));
     }
 
-    @RequestMapping("/msal4jsample/graph/me")
-    public ModelAndView getUserFromGraph(HttpServletRequest httpRequest, HttpServletResponse response)
+    @RequestMapping("/msal4jsample/graph/users")
+    public ModelAndView getUsersFromGraph(HttpServletRequest httpRequest, HttpServletResponse response)
             throws Throwable {
 
         IAuthenticationResult result;
@@ -78,8 +79,8 @@ public class AuthPageController {
 
                 String authorizationCodeUrl = authHelper.getAuthorizationCodeUrl(
                         httpRequest.getParameter("claims"),
-                        "User.Read",
-                        authHelper.getRedirectUriGraph(),
+                        "User.ReadBasic.all",
+                        authHelper.getRedirectUriGraphUsers(),
                         state,
                         nonce);
 
@@ -100,7 +101,7 @@ public class AuthPageController {
             setAccountInfo(mav, httpRequest);
 
             try {
-                mav.addObject("userInfo", getUserInfoFromGraph(result.accessToken()));
+                mav.addObject("users", getUserNamesFromGraph(result.accessToken()));
 
                 return mav;
             } catch (Exception e) {
@@ -111,9 +112,9 @@ public class AuthPageController {
         return mav;
     }
 
-    private String getUserInfoFromGraph(String accessToken) throws Exception {
-        // Microsoft Graph user endpoint
-        URL url = new URL("https://graph.microsoft.com/v1.0/me");
+    private String getUserNamesFromGraph(String accessToken) throws Exception {
+        // Microsoft Graph users endpoint
+        URL url = new URL("https://graph.microsoft.com/v1.0/users");
 
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
@@ -129,18 +130,18 @@ public class AuthPageController {
         }
 
         JSONObject responseObject = HttpClientHelper.processResponse(responseCode, response);
-//        JSONArray users = JSONHelper.fetchDirectoryObjectJSONArray(responseObject);
-//
-//        // Parse JSON to User objects, and append user names to string
-//        StringBuilder builder = new StringBuilder();
-//        for (int i = 0; i < users.length(); i++) {
-//            JSONObject thisUserJSONObject = users.optJSONObject(i);
-//            User user = new User();
-//            JSONHelper.convertJSONObjectToDirectoryObject(thisUserJSONObject, user);
-//            builder.append(user.getUserPrincipalName());
-//            builder.append("<br/>");
-//        }
-        return responseObject.toString();
+        JSONArray users = JSONHelper.fetchDirectoryObjectJSONArray(responseObject);
+
+        // Parse JSON to User objects, and append user names to string
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < users.length(); i++) {
+            JSONObject thisUserJSONObject = users.optJSONObject(i);
+            User user = new User();
+            JSONHelper.convertJSONObjectToDirectoryObject(thisUserJSONObject, user);
+            builder.append(user.getUserPrincipalName());
+            builder.append("<br/>");
+        }
+        return builder.toString();
     }
 
     private void setAccountInfo(ModelAndView model, HttpServletRequest httpRequest) throws ParseException {
