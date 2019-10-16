@@ -17,12 +17,11 @@
         {
           "Resource": "Microsoft Graph",
           "DelegatedPermissions": [
-            "User.Read",
-            "User.ReadBasic.All"
+            "User.Read"
           ]
         }
       ],
-      "ReplyUrls": "https://localhost:8080/msal4jsample/secure/aad, https://localhost:8080/msal4jsample/graph/users",
+      "ReplyUrls": "https://localhost:8080/msal4jsample/secure/aad, https://localhost:8080/msal4jsample/graph/me",
       "LogoutUrl": "https://localhost:8080/msal4jsample/sign-out"
     }
   ],

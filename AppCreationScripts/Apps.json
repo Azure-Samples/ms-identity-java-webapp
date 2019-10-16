@@ -16,7 +16,7 @@
           "type": "Web"
         } ,
         {
-          "url": "https://localhost:8080/msal4jsample/graph/users",
+          "url": "https://localhost:8080/msal4jsample/graph/me",
           "type": "Web"
         }
       ],
@@ -36,7 +36,7 @@
             {
               "id": "b340eb25-3456-403f-be2f-af7a0d370277",
               "type": "Scope",
-              "x-ms-name": "User.ReadBasic.All"
+              "x-ms-name": "User.Read"
             }
           ]
         }
