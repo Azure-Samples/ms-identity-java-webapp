@@ -23,7 +23,7 @@ This sample demonstrates a Java web application calling a Microsoft Graph that i
 1. The Java web application uses the Microsoft Authentication Library for Java (MSAL4J) to obtain an:
 
    - Id Token from Azure Active Directory (Azure AD) to sign in an user 
-   - Access token that is used as a bearer token when calling the Microsoft Graph to get information from users in a tenant.
+   - Access token that is used as a bearer token when calling the Microsoft Graph to get basic information of the signed-in user.
 
      ![Topology](./ReadmeFiles/Java-WebApp-Diagram.png)
 
@@ -73,25 +73,24 @@ application, from the *Favorites* or *All Directories* list.
 > In the next steps, you might need the tenant name (or directory name) or the tenant ID (or directory ID). These are 
 presented in the **Properties** of the Azure Active Directory window respectively as *Name* and *Directory ID*
 
-#### Register the app app (Webapp-Openidconnect)
+#### Register the app (Webapp-Openidconnect)
 
 1. In the  **Azure Active Directory** pane, click on **App registrations** and choose **New registration**.
 1. Enter a friendly name for the application, for example 'java-webapp', select "Accounts in any organizational directory 
-and personal Microsoft Accounts (e.g. Skype, Xbox, Outlook.com)" 
-   and select 'Web app / API' as the *Application Type*.
+and personal Microsoft Accounts (e.g. Skype, Xbox, Outlook.com)".
 1. Click **Register** to register the application.
 1. On the left hand menu, click on **Overview** and :
     - copy **Application (client) ID**
     - copy **Directory (tenant) ID**
     - You'll need both of these values later to configure the project, so put them in a safe place
 1. On the left hand menu, click on **Authentication**, and under *Redirect URIs*, select "Web". You will need to enter 
- two different redirect URIs: one for the signIn page, and one for the graph users page. For both, you should use the same
+ two different redirect URIs: one for the signIn page, and one for the graph page. For both, you should use the same
  host and port number, then followed by "/msal4jsample/secure/aad" for the sign in page and 
- "msal4jsample/graph/users" for the users page.
+ "msal4jsample/graph/me" for the user info page.
   By default, the sample uses: 
 
     - `http://localhost:8080/msal4jsample/secure/aad`. 
-    - `http://localhost:8080/msal4jsample/graph/users`
+    - `http://localhost:8080/msal4jsample/graph/me`
 
 Click on **save**.
 1. On the left hand menu, choose **Certificates & Secrets** and click on `New client secret` in the **Client Secrets** section:
@@ -101,21 +100,16 @@ Click on **save**.
    - When you save this page, the key value will be displayed, copy, and save the value in a safe location.
    - You'll need this key later to configure the project. This key value will not be displayed again, nor retrievable by 
    any other means, so record it as soon as it is visible from the Azure portal.
-1. Configure Permissions for your application. To that extent, in the left side menu, click on 'API Permissions' section and then,
-   click on **Add a Permission**, then in the tab **Microsoft APIs**, click on `Microsoft Graph`. Then, click on  
-   **Delegated Permissions** and search for and select 
-    - **User.ReadBasic.All** under **User**.
-    - Click on **Add Permissions**
 
 ### Step 4:  Configure the sample to use your Azure AD tenant
 
 Open `application.properties` in the src/main/resources folder. Fill in with your tenant and app registration information 
-noted in registration step. Replace *Enter_the_Tenant_Info_Here* with the tenant id, *Enter_the_Application_Id_here* with the Application Id and 
+noted in registration step. Replace *Enter_the_Tenant_Id_Here* with the tenant id, *Enter_the_Application_Id_here* with the Application Id and 
 *Enter_the_Client_Secret_Here* with the key value noted.
 
 If you did not use the  default redirect URIs, then you'll have to update `aad.redirectUriSignin` and 
-`aad.redirectUriGraphUsers` as well with the registered redirect URIs. 
-> You can use any host and port number, but the path must stay the same (/msal4jsample/secure/aad and /msal4jsample/graph/users)
+`aad.redirectUriGraph` as well with the registered redirect URIs. 
+> You can use any host and port number, but the path must stay the same (/msal4jsample/secure/aad and /msal4jsample/graph/me)
 as these are mapped to the controllers that will process the requests. 
 
 ### Step 5: Run the application 
@@ -187,7 +181,7 @@ Example: `http://localhost:8080/msal4jsample`
 ### You're done!
 
 Click on "Login" to start the process of logging in. Once logged in, you'll see the account information for the user that 
-is logged in. You'll then have the option to "Sign out" or to "Show Users", which will list the users in your tenant. 
+is logged in. You'll then have the option to "Sign out" or to "Show User Info", which will display the basic information of the signed-in user. 
 
 ## Community Help and Support
 

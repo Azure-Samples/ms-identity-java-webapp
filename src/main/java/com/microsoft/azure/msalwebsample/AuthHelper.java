@@ -50,7 +50,7 @@ class AuthHelper {
     private String clientSecret;
     private String authority;
     private String redirectUriSignIn;
-    private String redirectUriGraphUsers;
+    private String redirectUriGraph;
 
     @Autowired
     BasicConfiguration configuration;
@@ -61,7 +61,7 @@ class AuthHelper {
         authority = configuration.getAuthority();
         clientSecret = configuration.getSecretKey();
         redirectUriSignIn = configuration.getRedirectUriSignin();
-        redirectUriGraphUsers = configuration.getRedirectUriGraphUsers();
+        redirectUriGraph = configuration.getRedirectUriGraph();
     }
 
     void processAuthenticationCodeRedirect(HttpServletRequest httpRequest, String currentUri, String fullUrl)
@@ -109,7 +109,7 @@ class AuthHelper {
         }
 
         SilentParameters parameters = SilentParameters.builder(
-                Collections.singleton("User.ReadBasic.All"),
+                Collections.singleton("User.Read"),
                 result.account()).build();
 
         CompletableFuture<IAuthenticationResult> future = app.acquireTokenSilently(parameters);
