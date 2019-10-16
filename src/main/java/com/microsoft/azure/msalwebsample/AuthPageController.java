@@ -129,17 +129,6 @@ public class AuthPageController {
         }
 
         JSONObject responseObject = HttpClientHelper.processResponse(responseCode, response);
-//        JSONArray users = JSONHelper.fetchDirectoryObjectJSONArray(responseObject);
-//
-//        // Parse JSON to User objects, and append user names to string
-//        StringBuilder builder = new StringBuilder();
-//        for (int i = 0; i < users.length(); i++) {
-//            JSONObject thisUserJSONObject = users.optJSONObject(i);
-//            User user = new User();
-//            JSONHelper.convertJSONObjectToDirectoryObject(thisUserJSONObject, user);
-//            builder.append(user.getUserPrincipalName());
-//            builder.append("<br/>");
-//        }
         return responseObject.toString();
     }
 
