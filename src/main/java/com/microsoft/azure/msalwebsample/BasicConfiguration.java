@@ -21,7 +21,7 @@ class BasicConfiguration {
     String clientId;
     @Getter(AccessLevel.NONE) String authority;
     String redirectUriSignin;
-    String redirectUriGraphUsers;
+    String redirectUriGraph;
     String secretKey;
 
     String getAuthority(){
