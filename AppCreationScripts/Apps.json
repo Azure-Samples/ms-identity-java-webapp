@@ -12,11 +12,11 @@
       "logoutUrl":  "https://localhost:8080/msal4jsample/sign-out",
       "replyUrlsWithType": [
         {
-          "url": "https://localhost:8080/msal4jsample/secure/aad",
+          "url": "http://localhost:8080/msal4jsample/secure/aad",
           "type": "Web"
         } ,
         {
-          "url": "https://localhost:8080/msal4jsample/graph/me",
+          "url": "http://localhost:8080/msal4jsample/graph/me",
           "type": "Web"
         }
       ],
