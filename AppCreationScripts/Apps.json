@@ -9,7 +9,6 @@
       "x-ms-id": "JavaWebApp",
       "x-ms-name": "ms-identity-java-webapp",
       "x-ms-version": "2.0",
-      "logoutUrl":  "https://localhost:8080/msal4jsample/sign-out",
       "replyUrlsWithType": [
         {
           "url": "http://localhost:8080/msal4jsample/secure/aad",
@@ -21,6 +20,11 @@
         }
       ],
       "x-ms-passwordCredentials": "Auto",
+      "passwordCredentials": [
+        {
+          "value": "{auto}"
+        }
+      ],
       "oauth2AllowImplicitFlow": false,
       "oauth2AllowIdTokenImplicitFlow": false,
       "requiredResourceAccess": [
@@ -32,11 +36,6 @@
               "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
               "type": "Scope",
               "x-ms-name": "user.read"
-            },
-            {
-              "id": "b340eb25-3456-403f-be2f-af7a0d370277",
-              "type": "Scope",
-              "x-ms-name": "User.Read"
             }
           ]
         }

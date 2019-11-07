@@ -206,7 +206,7 @@ class AuthHelper {
     }
 
     private ConfidentialClientApplication createClientApplication() throws MalformedURLException {
-        return ConfidentialClientApplication.builder(clientId, ClientCredentialFactory.create(clientSecret)).
+        return ConfidentialClientApplication.builder(clientId, ClientCredentialFactory.createFromSecret(clientSecret)).
                 authority(authority).
                 build();
     }
