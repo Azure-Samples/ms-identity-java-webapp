@@ -20,6 +20,11 @@
         }
       ],
       "x-ms-passwordCredentials": "Auto",
+      "passwordCredentials": [
+        {
+          "value": "{auto}"
+        }
+      ],
       "oauth2AllowImplicitFlow": false,
       "oauth2AllowIdTokenImplicitFlow": false,
       "requiredResourceAccess": [
