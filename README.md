@@ -142,7 +142,6 @@ If you would like to deploy the web sample to Tomcat, you will need to make a co
 
     @SpringBootApplication
     public class MsalWebSampleApplication extends SpringBootServletInitializer {
-
      public static void main(String[] args) {
       SpringApplication.run(MsalWebSampleApplication.class, args);
      }
@@ -152,12 +151,13 @@ If you would like to deploy the web sample to Tomcat, you will need to make a co
       return builder.sources(MsalWebSampleApplication.class);
      }
     }
+
    ```
 
 3. Open a command prompt, go to the root folder of the project, and run `mvn package`
-    - This will generate a `msal-web-sample-0.1.0.war` file in your /targets directory. 
+    - This will generate a `msal-web-sample-0.1.0.war` file in your /targets directory.
     - Rename this file to `ROOT.war`
-    - Deploy this war file using Tomcat or any other J2EE container solution. 
+    - Deploy this war file using Tomcat or any other J2EE container solution.
         - To deploy on Tomcat container, copy the .war file to the webapps folder under your Tomcat installation and then start the Tomcat server.
 
 This WAR will automatically be hosted at `http://<yourserverhost>:<yourserverport>/`
@@ -181,6 +181,8 @@ Make sure that your questions or comments are tagged with [`msal` `Java`].
 If you find a bug in the sample, please raise the issue on [GitHub Issues](https://github.com/Azure-Samples/ms-identity-java-webapp/issues).
 
 To provide a recommendation, visit the following [User Voice page](https://feedback.azure.com/forums/169401-azure-active-directory).
+
+- Developers who wish to gain good familiarity of programming for Microsoft Graph are advised to go through the [An introduction to Microsoft Graph for developers](https://www.youtube.com/watch?v=EBbnpFdB92A) recorded session.
 
 ## Contributing
 
