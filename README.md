@@ -172,6 +172,8 @@ Example: `http://localhost:8080/msal4jsample`
 
 Click on "Login" to start the process of logging in. Once logged in, you'll see the account information for the user that is logged in. You'll then have the option to "Sign out" or to "Show User Info", which will display the basic information of the signed-in user.
 
+- Developers who wish to gain good familiarity of programming for Microsoft Graph are advised to go through the [An introduction to Microsoft Graph for developers](https://www.youtube.com/watch?v=EBbnpFdB92A) recorded session. 
+
 ## Community Help and Support
 
 Use [Stack Overflow](http://stackoverflow.com/questions/tagged/adal) to get support from the community.
