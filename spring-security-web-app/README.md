@@ -28,6 +28,12 @@ This sample demonstrates a Java web application showcasing how to use spring sec
 
 This sample shows how to build a Java web app that uses OpenId Connect to sign-in/ sign-out an user and to use spring security to validate access token obtained from the Authorization headers. For more information about how the protocols work in this scenario and other scenarios, see [Authentication Scenarios for Azure AD](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-authentication-scenarios).
 
+### What to validate
+
+While you should always validate tokens issued to the resources (audience) that you are developing, your application will also obtain access tokens for other resources from AAD. AAD will provide an access token in whatever token format that is appropriate to that resource.
+This access token itself should be treated like an opaque blob by your application, as your app isn’t the access token’s intended audience and thus your app should not bother itself with looking into the contents of this access token.
+Your app should just pass it in the call to the resource. It's called resource's responsibility to validate this access token.
+
 ## How to run this sample
 
 To run this sample, you'll need:
