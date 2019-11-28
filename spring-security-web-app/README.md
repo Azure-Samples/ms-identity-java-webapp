@@ -17,28 +17,16 @@ urlFragment: ms-identity-java-webapp
 
 ### Overview
 
-This sample demonstrates a Java web application showcasing how to use spring security to validate the access token obtained using OAuth2.0 and authenticates the user.
+This sample demonstrates a Java web application showcasing how to use spring security for logging in an user via OAuth2.0.
 
-1. The Java web application obtains an:
+1. The Java web application:
 
-   - Id Token from Azure Active Directory (Azure AD) to sign in an user
-   - Access token that is validated using Spring security.
+   - Obtains an Id Token from Azure Active Directory (Azure AD) to sign in an user
+   - uses Spring Security for logging-in an user via OAuth2.0
 
 ### Scenario
 
-This sample shows how to build a Java web app that uses OpenId Connect to sign-in/ sign-out an user and to use spring security to validate access token obtained from the Authorization headers. For more information about how the protocols work in this scenario and other scenarios, see [Authentication Scenarios for Azure AD](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-authentication-scenarios).
-
-### Token Validation
-
-A token represents the outcome of an authentication operation with some artifact that can be unambiguously tied to the Identity Provider that performed the authentication, without relying on any special network infrastructure.
-
-With Azure Active Directory taking the full responsibility of verifying user's raw credentials, the token receiver's responsibility shifts from verifying raw credentials to verifying that their caller did indeed go through your identity provider of choice and successfully authenticated. The identity provider represents successful authentication operations by issuing a token, hence the job now becomes to validate that token.
-
-### What to validate
-
-While you should always validate tokens issued to the resources (audience) that you are developing, your application will also obtain access tokens for other resources from AAD. AAD will provide an access token in whatever token format that is appropriate to that resource.
-This access token itself should be treated like an opaque blob by your application, as your app isn’t the access token’s intended audience and thus your app should not bother itself with looking into the contents of this access token.
-Your app should just pass it in the call to the resource. It's called resource's responsibility to validate this access token.
+This sample shows how to build a Java web app that uses OpenId Connect to sign-in/ sign-out an user and to use spring security to sign-in user via OAuth2.0. For more information about how the protocols work in this scenario and other scenarios, see [Authentication Scenarios for Azure AD](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-authentication-scenarios).
 
 ## How to run this sample
 
@@ -56,17 +44,21 @@ To successfully use this sample, you need a working installation of [Java](https
 
 From your shell or command line:
 
+```Shell
 - `git clone https://github.com/Azure-Samples/ms-identity-java-webapp.git`
+```
 
 Go to `spring-security-web-app` folder
 
-- cd `spring-security-web-app`
+```Shell
+- `cd spring-security-web-app`
+```
+
+or download and extract the repository .zip file.
 
 ### Step 3:  Register the sample with your Azure Active Directory tenant
 
 To register the project, you can follow the steps in the paragraphs below:
-
-#### First step: choose the Azure AD tenant where you want to create your applications
 
 #### Choose the Azure AD tenant where you want to create your applications
 
@@ -113,7 +105,7 @@ Run it directly from your IDE by using the embedded spring boot server or packag
 
 #### Running from IDE
 
-If you running you web application from an IDE, click on **run**, then navigate to the home page of the project. For this sample, the standard home page URL is <http://localhost:8080>
+If you are running the web application from an IDE, click on **run**, then navigate to the home page of the project. For this sample, the standard home page URL is <http://localhost:8080>
 
 #### Packaging and deploying to container
 
@@ -179,10 +171,16 @@ Click on "Login" to start the process of logging in. Once logged in, you'll see 
 
 The relevant code for this sample is in the `AppConfiguration.java` file.
 
-This class extends `WebSecurityConfigurerAdapter` from which the `configure` method is overridden.
+This class extends `WebSecurityConfigurerAdapter` from which the `configure` method is overridden, which allows the application to configure Springs HttpSecurity object. In the case of this sample, we configure settings for authorization of requests and logout of users"
 
 ```Java
-public void configure(HttpSecurity http) throws Exception {
+@Configuration
+@EnableOAuth2Sso
+@Order(value = 0)
+public class AppConfiguration extends WebSecurityConfigurerAdapter {
+
+    @Override
+    public void configure(HttpSecurity http) throws Exception {
 
         http.antMatcher("/**")
                 .authorizeRequests()
@@ -196,6 +194,7 @@ public void configure(HttpSecurity http) throws Exception {
                         .invalidateHttpSession(true)
                         .logoutSuccessUrl("/");
     }
+}
 ```
 
 ## Community Help and Support
