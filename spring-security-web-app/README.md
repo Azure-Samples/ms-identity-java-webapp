@@ -7,7 +7,7 @@ author: ramya25
 products:
 - spring security
 - azure-active-directory
-description: "This sample demonstrates a Java web application showcasing how to use Spring security to validate the access token obtained using OAuth2.0."
+description: "This sample demonstrates a Java web application showcasing how to use Spring security for logging in an user using OAuth2.0"
 urlFragment: ms-identity-java-webapp
 ---
 
