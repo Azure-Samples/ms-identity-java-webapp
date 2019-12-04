@@ -12,6 +12,8 @@ urlFragment: ms-identity-java-webapp
 
 # A Java Web application that signs in users with the Microsoft identity platform and calls Microsoft Graph
 
+> For a java web app sample using Spring Security framework take a look at [Spring Security webapp sample](https://github.com/Azure-Samples/ms-identity-java-webapp/tree/master/spring-security-web-app)
+
 ## About this sample
 
 > This sample is also available as a quickstart for the Microsoft identity platform: [Quickstart: Add sign-in with Microsoft to a Java web app](https://docs.microsoft.com/azure/active-directory/develop/quickstart-v2-java-webapp)
