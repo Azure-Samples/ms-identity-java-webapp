@@ -29,7 +29,6 @@ import com.nimbusds.openid.connect.sdk.AuthenticationErrorResponse;
 import com.nimbusds.openid.connect.sdk.AuthenticationResponse;
 import com.nimbusds.openid.connect.sdk.AuthenticationResponseParser;
 import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
-import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -40,7 +39,6 @@ import static com.microsoft.azure.msalwebsample.SessionManagementHelper.FAILED_T
  * Helpers for acquiring authorization codes and tokens from AAD
  */
 @Component
-@Getter
 class AuthHelper {
 
     static final String PRINCIPAL_SESSION_NAME = "principal";
@@ -213,5 +211,13 @@ class AuthHelper {
 
     private static boolean isAuthenticationSuccessful(AuthenticationResponse authResponse) {
         return authResponse instanceof AuthenticationSuccessResponse;
+    }
+
+    String getRedirectUriSignIn() {
+        return redirectUriSignIn;
+    }
+
+    String getRedirectUriGraph() {
+        return redirectUriGraph;
     }
 }
