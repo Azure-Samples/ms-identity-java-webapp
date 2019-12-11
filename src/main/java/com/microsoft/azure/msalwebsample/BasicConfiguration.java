@@ -3,9 +3,6 @@
 
 package com.microsoft.azure.msalwebsample;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -13,21 +10,56 @@ import org.springframework.stereotype.Component;
  * Object containing configuration data for the application. Spring will automatically wire the
  * values by grabbing them from application.properties file
  */
-@Getter
-@Setter
 @Component
 @ConfigurationProperties("aad")
 class BasicConfiguration {
-    String clientId;
-    @Getter(AccessLevel.NONE) String authority;
-    String redirectUriSignin;
-    String redirectUriGraph;
-    String secretKey;
 
-    String getAuthority(){
+    private String clientId;
+    private String authority;
+    private String redirectUriSignin;
+    private String redirectUriGraph;
+    private String secretKey;
+
+    public String getAuthority(){
         if (!authority.endsWith("/")) {
             authority += "/";
         }
         return authority;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setAuthority(String authority) {
+        this.authority = authority;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public String getRedirectUriSignin() {
+        return redirectUriSignin;
+    }
+
+    public void setRedirectUriSignin(String redirectUriSignin) {
+        this.redirectUriSignin = redirectUriSignin;
+    }
+
+    public String getRedirectUriGraph() {
+        return redirectUriGraph;
+    }
+
+    public void setRedirectUriGraph(String redirectUriGraph) {
+        this.redirectUriGraph = redirectUriGraph;
+    }
+
+    public String getSecretKey() {
+        return secretKey;
+    }
+
+    public void setSecretKey(String secretKey) {
+        this.secretKey = secretKey;
     }
 }
