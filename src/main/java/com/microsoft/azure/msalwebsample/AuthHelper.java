@@ -159,16 +159,32 @@ class AuthHelper {
                 URLEncoder.encode("openid offline_access profile" + " " + scope, "UTF-8");
 
 
-        String authorizationCodeUrl = authority + "oauth2/v2.0/authorize?" +
+        String authorizationCodeUrl = authority + "oauth2/V2.0/authorize?p=B2C_1_SIGN_UP_SIGN_IN&" +
                 "response_type=code&" +
                 "response_mode=form_post&" +
                 "redirect_uri=" +  URLEncoder.encode(registeredRedirectURL, "UTF-8") +
                 "&client_id=" + clientId +
                 "&scope=" + urlEncodedScopes +
                 (StringUtils.isEmpty(claims) ? "" : "&claims=" + claims) +
-                "&prompt=select_account" +
+                "&prompt=login" +
                 "&state=" + state
                 + "&nonce=" + nonce;
+
+        System.out.println(registeredRedirectURL);
+
+//        String authorizationCodeUrl = authority + "b2c_1_sign_up_sign_in/oauth2/v2.0/authorize?" +
+//                "response_type=code&" +
+//                "scope=" + urlEncodedScopes +
+//                "&client_id="+clientId+"&" +
+//                "redirect_uri=" +  URLEncoder.encode(registeredRedirectURL, "UTF-8") + "&" +
+//                "state=" + state +
+//                "&nonce=" + nonce + "&" +
+//                (StringUtils.isEmpty(claims) ? "" : "&claims=" + claims) + "&" +
+//                "client_info=1&" +
+//                "x-client-SKU=MSAL.JS&" +
+//                "x-client-Ver=1.1.2&" +
+//                "client-request-id=c7690b3c-7501-450f-bbe5-64f35dfb704d&" +
+//                "response_mode=form_post";
 
         return authorizationCodeUrl;
     }

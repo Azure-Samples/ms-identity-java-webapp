@@ -1,0 +1,7 @@
+aad.clientId=536d0eb7-d04d-426c-a928-ab527496a8bd
+aad.authority=https://login.microsoftonline.com/enmobileconsumer.onmicrosoft.com/
+#aad.authority=https://enmobileconsumer.b2clogin.com/5eb33e92-5c1a-4564-87fe-e232d94a52b5/
+#aad.authority=https://enmobileconsumer.b2clogin.com/tfp/5eb33e92-5c1a-4564-87fe-e232d94a52b5/POLICY/v2.0/.well-known/openid-configuration
+aad.secretKey=-Ni1Z1Y2ufgZ7vL@::bKd?e=9:yQr-aO
+aad.redirectUriSignin=http://localhost:8080/msal4jsample/secure/aad
+aad.redirectUriGraph=http://localhost:8080/msal4jsample/graph/me
