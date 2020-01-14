@@ -39,7 +39,18 @@
             }
           ]
         }
-      ]
+      ],
+     "codeConfigurations": [	
+       {
+		     "settingFile": "/src/main/resources/application.properties", 
+		     "replaceTokens": 
+           {
+             "appId": "Enter_the_Application_Id_here",
+             "tenantId": "Enter_the_Tenant_Info_Here",
+             "clientSecret": "Enter_the_Client_Secret_Here"
+			     }
+        }
+      ]	
     }
   ]
 }
