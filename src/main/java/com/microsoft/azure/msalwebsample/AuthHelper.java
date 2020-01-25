@@ -19,6 +19,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import javax.annotation.PostConstruct;
 import javax.naming.ServiceUnavailableException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -43,6 +44,8 @@ class AuthHelper {
 
     static final String PRINCIPAL_SESSION_NAME = "principal";
     static final String TOKEN_CACHE_SESSION_ATTRIBUTE = "token_cache";
+
+    static final String STATE = "state";
 
     private String clientId;
     private String clientSecret;
@@ -70,7 +73,7 @@ class AuthHelper {
             params.put(key, Collections.singletonList(httpRequest.getParameterMap().get(key)[0]));
         }
         // validate that state in response equals to state in request
-        StateData stateData = SessionManagementHelper.validateState(httpRequest.getSession(), params.get(SessionManagementHelper.STATE).get(0));
+        validateState(CookieHelper.getCookie(httpRequest, CookieHelper.MSAL_WEB_APP_STATE_COOKIE), params.get(STATE).get(0));
 
         AuthenticationResponse authResponse = AuthenticationResponseParser.parse(new URI(fullUrl), params);
         if (AuthHelper.isAuthenticationSuccessful(authResponse)) {
@@ -84,7 +87,9 @@ class AuthHelper {
                     currentUri);
 
             // validate nonce to prevent reply attacks (code maybe substituted to one with broader access)
-            validateNonce(stateData, getNonceClaimValueFromIdToken(result.idToken()));
+            validateNonce(CookieHelper.getCookie(httpRequest, CookieHelper.MSAL_WEB_APP_NONCE_COOKIE),
+                    getNonceClaimValueFromIdToken(result.idToken()));
+
             SessionManagementHelper.setSessionPrincipal(httpRequest, result);
         } else {
             AuthenticationErrorResponse oidcResponse = (AuthenticationErrorResponse) authResponse;
@@ -119,8 +124,14 @@ class AuthHelper {
         return updatedResult;
     }
 
-    private void validateNonce(StateData stateData, String nonce) throws Exception {
-        if (StringUtils.isEmpty(nonce) || !nonce.equals(stateData.getNonce())) {
+    private void validateState(String cookieValue, String state) throws Exception {
+        if (StringUtils.isEmpty(state) || !state.equals(cookieValue)) {
+            throw new Exception(FAILED_TO_VALIDATE_MESSAGE + "could not validate state");
+        }
+    }
+
+    private void validateNonce(String cookieValue, String nonce) throws Exception {
+        if (StringUtils.isEmpty(nonce) || !nonce.equals(cookieValue)) {
             throw new Exception(FAILED_TO_VALIDATE_MESSAGE + "could not validate nonce");
         }
     }
@@ -142,7 +153,8 @@ class AuthHelper {
         // state parameter to validate response from Authorization server and nonce parameter to validate idToken
         String state = UUID.randomUUID().toString();
         String nonce = UUID.randomUUID().toString();
-        SessionManagementHelper.storeStateAndNonceInSession(httpRequest.getSession(), state, nonce);
+
+        CookieHelper.setStateNonceCookies(httpRequest, httpResponse, state, nonce);
 
         httpResponse.setStatus(302);
         String authorizationCodeUrl = getAuthorizationCodeUrl(httpRequest.getParameter("claims"), scope, redirectURL, state, nonce);

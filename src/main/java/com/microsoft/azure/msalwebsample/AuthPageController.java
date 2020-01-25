@@ -59,13 +59,13 @@ public class AuthPageController {
     }
 
     @RequestMapping("/msal4jsample/graph/me")
-    public ModelAndView getUserFromGraph(HttpServletRequest httpRequest, HttpServletResponse response)
+    public ModelAndView getUserFromGraph(HttpServletRequest httpRequest, HttpServletResponse httpResponse)
             throws Throwable {
 
         IAuthenticationResult result;
         ModelAndView mav;
         try {
-            result = authHelper.getAuthResultBySilentFlow(httpRequest, response);
+            result = authHelper.getAuthResultBySilentFlow(httpRequest, httpResponse);
         } catch (ExecutionException e) {
             if (e.getCause() instanceof MsalInteractionRequiredException) {
 
@@ -74,7 +74,7 @@ public class AuthPageController {
                 String state = UUID.randomUUID().toString();
                 String nonce = UUID.randomUUID().toString();
 
-                SessionManagementHelper.storeStateAndNonceInSession(httpRequest.getSession(), state, nonce);
+                CookieHelper.setStateNonceCookies(httpRequest, httpResponse, state, nonce);
 
                 String authorizationCodeUrl = authHelper.getAuthorizationCodeUrl(
                         httpRequest.getParameter("claims"),

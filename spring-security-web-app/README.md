@@ -82,7 +82,7 @@ As a first step you'll need to:
 1. In the Application menu blade, click on **Authentication**, under **Redirect URIs**, select **Web** and enter the redirect URL.
    By default, the sample uses:
 
-   - `http://localhost:8080/login`
+   - `https://localhost:8080/login`
 
     Click on **save**.
 
@@ -96,6 +96,17 @@ As a first step you'll need to:
 ### Step 4:  Configure the sample to use your Azure AD tenant
 
 Open `application.properties` in the src/main/resources folder. Fill in with your tenant and app registration information noted in registration step. Replace *Enter_the_Tenant_Info_Here* with the **Tenant Id**, *Enter_the_Application_Id_here* with the **Application Id** and *Enter_the_Client_Secret_Here* with the **key value** noted.
+
+In order to use https with localhost fill in server.ssl.key properties.  
+Use keytool utility (included in JRE) if you want to generate self-signed certificate.
+
+Example:  
+keytool -genkeypair -alias testCert -keyalg RSA -storetype PKCS12 -keystore keystore.p12 -storepass password
+
+server.ssl.key-store-type=PKCS12  
+server.ssl.key-store=classpath:keystore.p12  
+server.ssl.key-store-password=password  
+server.ssl.key-alias=testCert  
 
 ### Step 5: Run the application
 
@@ -155,13 +166,13 @@ If you would like to deploy the web sample to Tomcat, you will need to make a co
     - Deploy this war file using Tomcat or any other J2EE container solution.
         - To deploy on Tomcat container, copy the .war file to the springsecuritywebapp's folder under your Tomcat installation and then start the Tomcat server.
 
-    This WAR will automatically be hosted at `http://<yourserverhost>:<yourserverport>/`
+    This WAR will automatically be hosted at `https://<yourserverhost>:<yourserverport>/`
         - Tomcats default port is 8080. This can be changed by
         - Going to tomcat/conf/server.xml
         - Search "Connector Port"
         - Replace "8080" with your desired port number
 
-    Example: `http://localhost:8080`
+    Example: `https://localhost:8080`
 
 ### You're done
 
@@ -182,6 +193,9 @@ public class AppConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
 
+        String logoutUrl = env.getProperty("endSessionEndpoint") + "?post_logout_redirect_uri=" +
+                URLEncoder.encode(env.getProperty("homePage"), "UTF-8");
+
         http.antMatcher("/**")
                 .authorizeRequests()
                 .antMatchers("/", "/login**", "/error**")
@@ -192,7 +206,7 @@ public class AppConfiguration extends WebSecurityConfigurerAdapter {
                     .logout()
                         .deleteCookies()
                         .invalidateHttpSession(true)
-                        .logoutSuccessUrl("/");
+                        .logoutSuccessUrl(logoutUrl);
     }
 }
 ```
