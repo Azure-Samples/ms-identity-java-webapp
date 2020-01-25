@@ -104,6 +104,17 @@ Open `application.properties` in the src/main/resources folder. Fill in with you
 If you did not use the  default redirect URIs, then you'll have to update `aad.redirectUriSignin` and `aad.redirectUriGraph` as well with the registered redirect URIs.
 > You can use any host and port number, but the path must stay the same (/msal4jsample/secure/aad and /msal4jsample/graph/me) as these are mapped to the controllers that will process the requests.
 
+In order to use https with localhost fill in server.ssl.key properties.  
+Use keytool utility (included in JRE) if you want to generate self-signed certificate.
+
+Example:  
+keytool -genkeypair -alias testCert -keyalg RSA -storetype PKCS12 -keystore keystore.p12 -storepass password
+
+server.ssl.key-store-type=PKCS12  
+server.ssl.key-store=classpath:keystore.p12  
+server.ssl.key-store-password=password  
+server.ssl.key-alias=testCert 
+
 ### Step 5: Run the application
 
 To run the project, you can either:
