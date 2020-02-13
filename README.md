@@ -27,7 +27,9 @@ This sample demonstrates a Java web application calling a Microsoft Graph that i
 
      ![Topology](./ReadmeFiles/Java-WebApp-Diagram.png)
 
-> For a java web app sample using Spring Security framework take a look at [Spring Security webapp sample](https://github.com/Azure-Samples/ms-identity-java-webapp/tree/master/spring-security-web-app). 
+> For a java web app sample using Spring Security framework take a look at [Spring Security webapp sample](https://github.com/Azure-Samples/ms-identity-java-webapp/tree/master/spring-security-web-app).
+>
+> For a java web app sample using MSAL with Azure AD B2C take a look at [MSAL B2C webapp sample](https://github.com/Azure-Samples/ms-identity-java-webapp/tree/master/msal-b2c-web-sample).
 
 ### Scenario
 
@@ -107,13 +109,15 @@ If you did not use the  default redirect URIs, then you'll have to update `aad.r
 In order to use https with localhost fill in server.ssl.key properties.  
 Use keytool utility (included in JRE) if you want to generate self-signed certificate.
 
+```
 Example:  
 keytool -genkeypair -alias testCert -keyalg RSA -storetype PKCS12 -keystore keystore.p12 -storepass password
 
 server.ssl.key-store-type=PKCS12  
 server.ssl.key-store=classpath:keystore.p12  
 server.ssl.key-store-password=password  
-server.ssl.key-alias=testCert 
+server.ssl.key-alias=testCert
+```
 
 ### Step 5: Run the application
 
@@ -168,9 +172,9 @@ If you would like to deploy the web sample to Tomcat, you will need to make a co
    ```
 
 3. Open a command prompt, go to the root folder of the project, and run `mvn package`
-    - This will generate a `msal-web-sample-0.1.0.war` file in your /targets directory. 
+    - This will generate a `msal-web-sample-0.1.0.war` file in your /targets directory.
     - Rename this file to `ROOT.war`
-    - Deploy this war file using Tomcat or any other J2EE container solution. 
+    - Deploy this war file using Tomcat or any other J2EE container solution.
         - To deploy on Tomcat container, copy the .war file to the webapps folder under your Tomcat installation and then start the Tomcat server.
 
 This WAR will automatically be hosted at `http://<yourserverhost>:<yourserverport>/`
@@ -185,7 +189,7 @@ Example: `http://localhost:8080/msal4jsample`
 
 Click on "Login" to start the process of logging in. Once logged in, you'll see the account information for the user that is logged in. You'll then have the option to "Sign out" or to "Show User Info", which will display the basic information of the signed-in user.
 
-- Developers who wish to gain good familiarity of programming for Microsoft Graph are advised to go through the [An introduction to Microsoft Graph for developers](https://www.youtube.com/watch?v=EBbnpFdB92A) recorded session. 
+- Developers who wish to gain good familiarity of programming for Microsoft Graph are advised to go through the [An introduction to Microsoft Graph for developers](https://www.youtube.com/watch?v=EBbnpFdB92A) recorded session.
 
 ## Community Help and Support
 

@@ -100,6 +100,7 @@ Open `application.properties` in the src/main/resources folder. Fill in with you
 In order to use https with localhost fill in server.ssl.key properties.  
 Use keytool utility (included in JRE) if you want to generate self-signed certificate.
 
+```
 Example:  
 keytool -genkeypair -alias testCert -keyalg RSA -storetype PKCS12 -keystore keystore.p12 -storepass password
 
@@ -107,6 +108,7 @@ server.ssl.key-store-type=PKCS12
 server.ssl.key-store=classpath:keystore.p12  
 server.ssl.key-store-password=password  
 server.ssl.key-alias=testCert  
+```
 
 ### Step 5: Run the application
 

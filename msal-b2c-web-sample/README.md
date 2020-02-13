@@ -74,13 +74,15 @@ In the steps below, "ClientID" is the same as "Application ID" or "AppId".
 In order to use https with localhost fill in server.ssl.key properties.  
 Use keytool utility (included in JRE) if you want to generate self-signed certificate.
 
+```
 Example:  
 keytool -genkeypair -alias testCert -keyalg RSA -storetype PKCS12 -keystore keystore.p12 -storepass password
 
 server.ssl.key-store-type=PKCS12  
 server.ssl.key-store=classpath:keystore.p12  
 server.ssl.key-store-password=password  
-server.ssl.key-alias=testCert 
+server.ssl.key-alias=testCert
+```
 
 ### Step 5: Run the application
 
@@ -135,9 +137,9 @@ If you would like to deploy the web sample to Tomcat, you will need to make a co
    ```
 
 3. Open a command prompt, go to the root folder of the project, and run `mvn package`
-    - This will generate a `msal-b2c-web-sample-0.1.0.war` file in your /targets directory. 
+    - This will generate a `msal-b2c-web-sample-0.1.0.war` file in your /targets directory.
     - Rename this file to `ROOT.war`
-    - Deploy this war file using Tomcat or any other J2EE container solution. 
+    - Deploy this war file using Tomcat or any other J2EE container solution.
         - To deploy on Tomcat container, copy the .war file to the webapps folder under your Tomcat installation and then start the Tomcat server.
 
 This WAR will automatically be hosted at `http://<yourserverhost>:<yourserverport>/`
@@ -191,4 +193,3 @@ For more information, see MSAL4J [conceptual documentation](https://github.com/A
 For more information about web apps scenarios on the Microsoft identity platform see [Scenario: Web app that signs in users](https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-web-app-sign-user-overview) and [Scenario: Web app that calls web APIs](https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-web-app-call-api-overview)
 
 For more information about how OAuth 2.0 protocols work in this scenario and other scenarios, see [Authentication Scenarios for Azure AD](http://go.microsoft.com/fwlink/?LinkId=394414).
-
