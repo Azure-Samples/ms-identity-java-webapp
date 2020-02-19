@@ -133,7 +133,7 @@ If you running you web application from an IDE, click on **run**, then navigate 
 
 If you would like to deploy the web sample to Tomcat, you will need to make a couple of changes to the source code.
 
-1. Open msal-web-sample/pom.xml
+1. Open ms-identity-java-webapp/pom.xml
     - Under `<name>msal-web-sample</name>` add `<packaging>war</packaging>`
     - Add dependency:
 
@@ -145,7 +145,7 @@ If you would like to deploy the web sample to Tomcat, you will need to make a co
          </dependency>
          ```
 
-2. Open msal-web-sample/src/main/java/com.microsoft.azure.msalwebsample/MsalWebSampleApplication
+2. Open ms-identity-java-webapp/src/main/java/com.microsoft.azure.msalwebsample/MsalWebSampleApplication
 
     - Delete all source code and replace with the following:
 
