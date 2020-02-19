@@ -52,6 +52,7 @@ class AuthHelper {
     private String authority;
     private String redirectUriSignIn;
     private String redirectUriGraph;
+    private String msGraphEndpointHost;
 
     @Autowired
     BasicConfiguration configuration;
@@ -63,6 +64,7 @@ class AuthHelper {
         clientSecret = configuration.getSecretKey();
         redirectUriSignIn = configuration.getRedirectUriSignin();
         redirectUriGraph = configuration.getRedirectUriGraph();
+        msGraphEndpointHost = configuration.getMsGraphEndpointHost();
     }
 
     void processAuthenticationCodeRedirect(HttpServletRequest httpRequest, String currentUri, String fullUrl)
@@ -231,5 +233,9 @@ class AuthHelper {
 
     String getRedirectUriGraph() {
         return redirectUriGraph;
+    }
+
+    String getMsGraphEndpointHost(){
+        return msGraphEndpointHost;
     }
 }

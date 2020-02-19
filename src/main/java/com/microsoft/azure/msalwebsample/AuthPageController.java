@@ -113,8 +113,7 @@ public class AuthPageController {
 
     private String getUserInfoFromGraph(String accessToken) throws Exception {
         // Microsoft Graph user endpoint
-        URL url = new URL("https://graph.microsoft.com/v1.0/me");
-
+        URL url = new URL(authHelper.getMsGraphEndpointHost() + "v1.0/me");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
         // Set the appropriate header fields in the request header.
