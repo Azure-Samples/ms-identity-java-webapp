@@ -47,8 +47,8 @@
            "appId": "Enter_the_Application_Id_here",
            "tenantId": "Enter_the_Tenant_Info_Here",
            "clientSecret": "Enter_the_Client_Secret_Here",
-           "aad.authorityEndpointHost": "https://login.microsoftonline.com/",
-           "aad.msGraphEndpointHost": "https://graph.microsoft.com/"
+           "authorityEndpointHost": "https://login.microsoftonline.com/",
+           "msGraphEndpointHost": "https://graph.microsoft.com/"
          }
         }
       ]	
