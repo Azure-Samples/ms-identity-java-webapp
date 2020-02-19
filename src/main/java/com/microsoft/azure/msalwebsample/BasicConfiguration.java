@@ -19,6 +19,7 @@ class BasicConfiguration {
     private String redirectUriSignin;
     private String redirectUriGraph;
     private String secretKey;
+    private String msGraphEndpointHost;
 
     public String getAuthority(){
         if (!authority.endsWith("/")) {
@@ -61,5 +62,13 @@ class BasicConfiguration {
 
     public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
+    }
+
+    public void setMsGraphEndpointHost(String msGraphEndpointHost) {
+        this.msGraphEndpointHost = msGraphEndpointHost;
+    }
+
+    public String getMsGraphEndpointHost(){
+        return msGraphEndpointHost;
     }
 }
