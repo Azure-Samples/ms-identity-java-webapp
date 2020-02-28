@@ -87,8 +87,8 @@ As a first step you'll need to:
 1. On the application **Authentication** page, under **Redirect URIs**, select **Web**. You will need to enter two different redirect URIs: one for the sign-in page, and one for the graph page. For both, you should use the same host and port number, then followed by "/msal4jsample/secure/aad" for the sign-in page and "msal4jsample/graph/me" for the user info page.
    By default, the sample uses:
 
-    - `http://localhost:8080/msal4jsample/secure/aad`.
-    - `http://localhost:8080/msal4jsample/graph/me`
+    - `https://localhost:8080/msal4jsample/secure/aad`.
+    - `https://localhost:8080/msal4jsample/graph/me`
 
     Click on **save**.
 
@@ -127,7 +127,7 @@ Run it directly from your IDE by using the embedded spring boot server or packag
 
 #### Running from IDE
 
-If you running you web application from an IDE, click on **run**, then navigate to the home page of the project. For this sample, the standard home page URL is <http://localhost:8080>
+If you running you web application from an IDE, click on **run**, then navigate to the home page of the project. For this sample, the standard home page URL is <https://localhost:8080>
 
 #### Packaging and deploying to container
 
@@ -183,7 +183,7 @@ This WAR will automatically be hosted at `http://<yourserverhost>:<yourserverpor
         - Search "Connector Port"
         - Replace "8080" with your desired port number
 
-Example: `http://localhost:8080/msal4jsample`
+Example: `https://localhost:8080/msal4jsample`
 
 ### You're done
 
