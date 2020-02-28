@@ -48,7 +48,7 @@
            "tenantId": "Enter_the_Tenant_Info_Here",
            "clientSecret": "Enter_the_Client_Secret_Here",
            "authorityEndpointHost": "https://login.microsoftonline.com/",
-           "msGraphEndpointHost": "https://graph.microsoft.com/"
+           "msgraphEndpointHost": "https://graph.microsoft.com/"
          }
         }
       ]	
