@@ -74,8 +74,7 @@ public class AuthPageController {
                 String state = UUID.randomUUID().toString();
                 String nonce = UUID.randomUUID().toString();
 
-                CookieHelper.setStateNonceCookies(httpRequest, httpResponse, state, nonce);
-
+                SessionManagementHelper.storeStateAndNonceInSession(httpRequest.getSession(), state, nonce);
                 String authorizationCodeUrl = authHelper.getAuthorizationCodeUrl(
                         httpRequest.getParameter("claims"),
                         "User.Read",
