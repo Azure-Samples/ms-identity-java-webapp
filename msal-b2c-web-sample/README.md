@@ -37,7 +37,7 @@ This sample covers the following:
 In the tutorial that you completed as part of the prerequisites, you [added a web application in Azure AD B2C](https://docs.microsoft.com/azure/active-directory-b2c/tutorial-register-applications).
 To enable communication with the sample in this tutorial, you need to add a redirect URI to that application in Azure AD B2C.
 
-* Modify an existing or add a new **Reply URL**,  `https://localhost:8080/msal4jsample/secure/aad`.
+* Modify an existing or add a new **Reply URL**,  `https://localhost:8443/msal4jsample/secure/aad`.
 * On the properties page, record the application ID that you'll use when you configure the web application.
 * Also generate a key (client secret) for your web application. Record the key that you'll use when you configure this sample.
 
@@ -69,7 +69,7 @@ In the steps below, "ClientID" is the same as "Application ID" or "AppId".
      For example, replace `fabrikamb2c` with `contoso`.
    * Set the value of `b2c.clientId` with the application ID that you recorded.
    * Replace the value of `b2c.secret` with the key that you recorded.
-   * Replace the value of `b2c.redirectUri` with `https://localhost:8080/msal4jsample/secure/aad​`.
+   * Replace the value of `b2c.redirectUri` with `https://localhost:8443/msal4jsample/secure/aad​`.
 
 In order to use https with localhost fill in server.ssl.key properties.  
 Use keytool utility (included in JRE) if you want to generate self-signed certificate.
@@ -92,7 +92,7 @@ Run it directly from your IDE by using the embedded spring boot server or packag
 
 #### Running from IDE
 
-If you running you web application from an IDE, click on **run**, then navigate to the home page of the project. For this sample, the standard home page URL is <https://localhost:8080>
+If you running you web application from an IDE, click on **run**, then navigate to the home page of the project. For this sample, the standard home page URL is <https://localhost:8443>
 
 #### Packaging and deploying to container
 
@@ -110,7 +110,7 @@ If you would like to deploy the web sample to Tomcat, you will need to make a co
          </dependency>
          ```
 
-2. Open msal-b2c-web-sample/src/main/java/com.microsoft.azure.msalwebsample/MsalB2CWebSampleApplication
+2. Open msal-b2c-web-sample/src/main/java/com/microsoft/azure/msalwebsample/MsalB2CWebSampleApplication
 
     - Delete all source code and replace with the following:
 
@@ -136,20 +136,25 @@ If you would like to deploy the web sample to Tomcat, you will need to make a co
     }
    ```
 
-3. Open a command prompt, go to the root folder of the project, and run `mvn package`
+3.   Tomcat's default HTTP port is 8080, though an HTTPS connection over port 8443 is needed. To configure this:
+        - Go to tomcat/conf/server.xml
+        - Search for the `<connector>` tag, and replace the existing connector with:
+        ```
+        <Connector
+                   protocol="org.apache.coyote.http11.Http11NioProtocol"
+                   port="8443" maxThreads="200"
+                   scheme="https" secure="true" SSLEnabled="true"
+                   keystoreFile="C:/Path/To/Keystore/File/keystore.p12" keystorePass="KeystorePassword"
+                   clientAuth="false" sslProtocol="TLS"/>
+        ``` 
+       
+4. Open a command prompt, go to the root folder of this sample (where the pom.xml file is located), and run `mvn package` to build the project
     - This will generate a `msal-b2c-web-sample-0.1.0.war` file in your /targets directory.
-    - Rename this file to `ROOT.war`
+    - Rename this file to `msal4jsample.war`
     - Deploy this war file using Tomcat or any other J2EE container solution.
-        - To deploy on Tomcat container, copy the .war file to the webapps folder under your Tomcat installation and then start the Tomcat server.
+        - To deploy, copy the ROOT.war file to the `/webapps/` directory in your Tomcat installation, and then start the Tomcat server.
 
-This WAR will automatically be hosted at `http://<yourserverhost>:<yourserverport>/`
-    - Tomcats default port is 8080. This can be changed by
-        - Going to tomcat/conf/server.xml
-        - Search "Connector Port"
-        - Replace "8080" with your desired port number
-
-Example: `http://localhost:8080/`
-
+5. Once deployed, go to https://localhost:8443/msal4jsample in your browser
 ### You're done
 
 Click on "Login" to start the process of logging in. Once logged in, you'll see the information for the user that is logged in and the API call result. You'll then have the option to "Sign out" or to "Edit profile".
