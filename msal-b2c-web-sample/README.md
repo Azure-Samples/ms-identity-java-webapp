@@ -100,15 +100,6 @@ If you would like to deploy the web sample to Tomcat, you will need to make a co
 
 1. Open msal-b2c-web-sample/pom.xml
     - Under `<name>msal-web-sample</name>` add `<packaging>war</packaging>`
-    - Add dependency:
-
-         ```xml
-         <dependency>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-starter-tomcat</artifactId>
-          <scope>provided</scope>
-         </dependency>
-         ```
 
 2. Open msal-b2c-web-sample/src/main/java/com/microsoft/azure/msalwebsample/MsalB2CWebSampleApplication
 

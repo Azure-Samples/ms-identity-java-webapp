@@ -135,15 +135,6 @@ If you would like to deploy the web sample to Tomcat, you will need to make a co
 
 1. Open ms-identity-java-webapp/pom.xml
     - Under `<name>msal-web-sample</name>` add `<packaging>war</packaging>`
-    - Add dependency:
-
-         ```xml
-         <dependency>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-starter-tomcat</artifactId>
-          <scope>provided</scope>
-         </dependency>
-         ```
 
 2. Open ms-identity-java-webapp/src/main/java/com.microsoft.azure.msalwebsample/MsalWebSampleApplication
 
