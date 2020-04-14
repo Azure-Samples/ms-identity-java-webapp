@@ -53,7 +53,7 @@ public class AuthPageController {
 
         String endSessionEndpoint = "https://login.microsoftonline.com/common/oauth2/v2.0/logout";
 
-        String redirectUrl = "http://localhost:8080/msal4jsample/";
+        String redirectUrl = "https://localhost:8443/msal4jsample/";
         response.sendRedirect(endSessionEndpoint + "?post_logout_redirect_uri=" +
                 URLEncoder.encode(redirectUrl, "UTF-8"));
     }
