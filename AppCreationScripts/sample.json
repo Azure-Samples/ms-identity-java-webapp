@@ -21,7 +21,7 @@
           ]
         }
       ],
-      "ReplyUrls": "http://localhost:8080/msal4jsample/secure/aad, http://localhost:8080/msal4jsample/graph/me"
+      "ReplyUrls": "https://localhost:8443/msal4jsample/secure/aad, https://localhost:8443/msal4jsample/graph/me"
     }
   ],
   "CodeConfiguration": []

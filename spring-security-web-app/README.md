@@ -82,7 +82,7 @@ As a first step you'll need to:
 1. In the Application menu blade, click on **Authentication**, under **Redirect URIs**, select **Web** and enter the redirect URL.
    By default, the sample uses:
 
-   - `https://localhost:8080/login`
+   - `https://localhost:8443/msal4jsample/login`
 
     Click on **save**.
 
@@ -101,7 +101,6 @@ In order to use https with localhost fill in server.ssl.key properties.
 Use keytool utility (included in JRE) if you want to generate self-signed certificate.
 
 ```
-Example:  
 keytool -genkeypair -alias testCert -keyalg RSA -storetype PKCS12 -keystore keystore.p12 -storepass password
 
 server.ssl.key-store-type=PKCS12  
@@ -114,11 +113,11 @@ server.ssl.key-alias=testCert
 
 To run the project, you can either:
 
-Run it directly from your IDE by using the embedded spring boot server or package it to a WAR file using [maven](https://maven.apache.org/plugins/maven-war-plugin/usage.html) and deploy it a J2EE container solution such as [Apache Tomcat](http://tomcat.apache.org/).
+Run it directly from your IDE by using the embedded spring boot server, or package it to a WAR file using [maven](https://maven.apache.org/plugins/maven-war-plugin/usage.html) and deploy it a J2EE container solution such as [Apache Tomcat](http://tomcat.apache.org/).
 
 #### Running from IDE
 
-If you are running the web application from an IDE, click on **run**, then navigate to the home page of the project. For this sample, the standard home page URL is <http://localhost:8080>
+If you are running the web application from an IDE, click on **run**, then navigate to the home page of the project. For this sample, the standard home page URL is <https://localhost:8443>, as defined in application.properties
 
 #### Packaging and deploying to container
 
@@ -126,17 +125,8 @@ If you would like to deploy the web sample to Tomcat, you will need to make a co
 
 1. Open spring-security-web-app/pom.xml
     - Under `<name>spring-security-web-app</name>` add `<packaging>war</packaging>`
-    - Add dependency:
 
-         ```xml
-         <dependency>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-starter-tomcat</artifactId>
-          <scope>provided</scope>
-         </dependency>
-         ```
-
-2. Open spring-security-web-app/src/main/java/com.microsoft.azure.springsecuritywebapp/SpringSecurityWebAppApplication
+2. Open spring-security-web-app/src/main/java/com/microsoft/azure/springsecuritywebapp/SpringSecurityWebAppApplication
 
     - Delete all source code and replace with the following:
 
@@ -161,20 +151,25 @@ If you would like to deploy the web sample to Tomcat, you will need to make a co
          }
         }
    ```
-
-3. Open a command prompt, go to the root folder of the project, and run `mvn package`
+3.   Tomcat's default HTTP port is 8080, though an HTTPS connection over port 8443 is needed. To configure this:
+        - Go to tomcat/conf/server.xml
+        - Search for the `<connector>` tag, and replace the existing connector with:
+        ```
+        <Connector
+                   protocol="org.apache.coyote.http11.Http11NioProtocol"
+                   port="8443" maxThreads="200"
+                   scheme="https" secure="true" SSLEnabled="true"
+                   keystoreFile="C:/Path/To/Keystore/File/keystore.p12" keystorePass="KeystorePassword"
+                   clientAuth="false" sslProtocol="TLS"/>
+        ``` 
+       
+4. Open a command prompt, go to the root folder of this sample (where the pom.xml file is located), and run `mvn package` to build the project
     - This will generate a `spring-security-web-app.war` file in your /targets directory.
-    - Rename this file to `ROOT.war`
+    - Rename this file to `msal4jsample.war`
     - Deploy this war file using Tomcat or any other J2EE container solution.
-        - To deploy on Tomcat container, copy the .war file to the springsecuritywebapp's folder under your Tomcat installation and then start the Tomcat server.
+        - To deploy, copy the ROOT.war file to the `/webapps/` directory in your Tomcat installation, and then start the Tomcat server.
 
-    This WAR will automatically be hosted at `https://<yourserverhost>:<yourserverport>/`
-        - Tomcats default port is 8080. This can be changed by
-        - Going to tomcat/conf/server.xml
-        - Search "Connector Port"
-        - Replace "8080" with your desired port number
-
-    Example: `https://localhost:8080`
+5. Once deployed, go to https://localhost:8443/msal4jsample in your browser
 
 ### You're done
 

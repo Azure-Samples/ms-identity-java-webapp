@@ -87,8 +87,8 @@ As a first step you'll need to:
 1. On the application **Authentication** page, under **Redirect URIs**, select **Web**. You will need to enter two different redirect URIs: one for the sign-in page, and one for the graph page. For both, you should use the same host and port number, then followed by "/msal4jsample/secure/aad" for the sign-in page and "msal4jsample/graph/me" for the user info page.
    By default, the sample uses:
 
-    - `https://localhost:8080/msal4jsample/secure/aad`.
-    - `https://localhost:8080/msal4jsample/graph/me`
+    - `https://localhost:8443/msal4jsample/secure/aad`.
+    - `https://localhost:8443/msal4jsample/graph/me`
 
     Click on **save**.
 
@@ -127,7 +127,7 @@ Run it directly from your IDE by using the embedded spring boot server or packag
 
 #### Running from IDE
 
-If you running you web application from an IDE, click on **run**, then navigate to the home page of the project. For this sample, the standard home page URL is <https://localhost:8080>
+If you running you web application from an IDE, click on **run**, then navigate to the home page of the project. For this sample, the standard home page URL is <https://localhost:8443>
 
 #### Packaging and deploying to container
 
@@ -135,15 +135,6 @@ If you would like to deploy the web sample to Tomcat, you will need to make a co
 
 1. Open ms-identity-java-webapp/pom.xml
     - Under `<name>msal-web-sample</name>` add `<packaging>war</packaging>`
-    - Add dependency:
-
-         ```xml
-         <dependency>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-starter-tomcat</artifactId>
-          <scope>provided</scope>
-         </dependency>
-         ```
 
 2. Open ms-identity-java-webapp/src/main/java/com.microsoft.azure.msalwebsample/MsalWebSampleApplication
 
@@ -171,19 +162,26 @@ If you would like to deploy the web sample to Tomcat, you will need to make a co
     }
    ```
 
-3. Open a command prompt, go to the root folder of the project, and run `mvn package`
+3.   Tomcat's default HTTP port is 8080, though an HTTPS connection over port 8443 is needed. To configure this:
+        - Go to tomcat/conf/server.xml
+        - Search for the `<connector>` tag, and replace the existing connector with:
+        ```
+        <Connector
+                   protocol="org.apache.coyote.http11.Http11NioProtocol"
+                   port="8443" maxThreads="200"
+                   scheme="https" secure="true" SSLEnabled="true"
+                   keystoreFile="C:/Path/To/Keystore/File/keystore.p12" keystorePass="KeystorePassword"
+                   clientAuth="false" sslProtocol="TLS"/>
+        ``` 
+       
+4. Open a command prompt, go to the root folder of this sample (where the pom.xml file is located), and run `mvn package` to build the project
     - This will generate a `msal-web-sample-0.1.0.war` file in your /targets directory.
-    - Rename this file to `ROOT.war`
+    - Rename this file to `msal4jsample.war`
     - Deploy this war file using Tomcat or any other J2EE container solution.
-        - To deploy on Tomcat container, copy the .war file to the webapps folder under your Tomcat installation and then start the Tomcat server.
+        - To deploy, copy the ROOT.war file to the `/webapps/` directory in your Tomcat installation, and then start the Tomcat server.
 
-This WAR will automatically be hosted at `http://<yourserverhost>:<yourserverport>/`
-    - Tomcats default port is 8080. This can be changed by
-        - Going to tomcat/conf/server.xml
-        - Search "Connector Port"
-        - Replace "8080" with your desired port number
+5. Once deployed, go to https://localhost:8443/msal4jsample in your browser
 
-Example: `https://localhost:8080/msal4jsample`
 
 ### You're done
 
