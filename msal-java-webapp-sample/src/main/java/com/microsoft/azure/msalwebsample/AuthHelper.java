@@ -163,7 +163,7 @@ class AuthHelper {
 
         String authorizationCodeUrl = authority + "oauth2/v2.0/authorize?" +
                 "response_type=code&" +
-                "response_mode=form_post&" +
+                "response_mode=query&" +
                 "redirect_uri=" +  URLEncoder.encode(registeredRedirectURL, "UTF-8") +
                 "&client_id=" + clientId +
                 "&scope=" + urlEncodedScopes +
