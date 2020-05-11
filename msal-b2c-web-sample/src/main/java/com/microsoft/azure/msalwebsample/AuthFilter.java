@@ -174,7 +174,7 @@ public class AuthFilter implements Filter {
 
         String redirectUrl = authority.replace("/tfp", "") + "oauth2/v2.0/authorize?" +
                 "response_type=code&" +
-                "response_mode=form_post&" +
+                "response_mode=query&" +
                 "redirect_uri=" + URLEncoder.encode(authHelper.configuration.redirectUri, "UTF-8") +
                 "&client_id=" + authHelper.configuration.clientId +
                 "&scope=" + URLEncoder.encode("openid offline_access profile " +
