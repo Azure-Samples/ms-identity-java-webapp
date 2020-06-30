@@ -156,23 +156,22 @@ class AuthHelper {
     String getAuthorizationCodeUrl(String claims, String scope, String registeredRedirectURL, String state, String nonce)
             throws UnsupportedEncodingException {
 
-        String urlEncodedScopes = scope == null ?
-                URLEncoder.encode("openid offline_access profile", "UTF-8") :
-                URLEncoder.encode("openid offline_access profile" + " " + scope, "UTF-8");
+        String urlEncodedScopes = scope == null ? "" : URLEncoder.encode(scope, "UTF-8");
 
+        PublicClientApplication pca = PublicClientApplication.builder(clientId).build();
 
-        String authorizationCodeUrl = authority + "oauth2/v2.0/authorize?" +
-                "response_type=code&" +
-                "response_mode=query&" +
-                "redirect_uri=" +  URLEncoder.encode(registeredRedirectURL, "UTF-8") +
-                "&client_id=" + clientId +
-                "&scope=" + urlEncodedScopes +
-                (StringUtils.isEmpty(claims) ? "" : "&claims=" + claims) +
-                "&prompt=select_account" +
-                "&state=" + state
-                + "&nonce=" + nonce;
+        AuthorizationRequestUrlParameters parameters =
+                AuthorizationRequestUrlParameters
+                        .builder(registeredRedirectURL,
+                                Collections.singleton(urlEncodedScopes))
+                        .responseMode(ResponseMode.QUERY)
+                        .prompt(Prompt.SELECT_ACCOUNT)
+                        .state(state)
+                        .nonce(nonce)
+                        .claimsChallenge(claims)
+                        .build();
 
-        return authorizationCodeUrl;
+        return pca.getAuthorizationRequestUrl(parameters).toString();
     }
 
     private IAuthenticationResult getAuthResultByAuthCode(
