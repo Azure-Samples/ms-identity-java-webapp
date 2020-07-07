@@ -42,7 +42,7 @@
       ],
      "codeConfigurations": [	
        {
-         "settingFile": "msal-openid-connect-sample/src/main/resources/application.properties",
+         "settingFile": "msal-java-webapp-sample/src/main/resources/application.properties",
          "replaceTokens": {
            "appId": "Enter_the_Application_Id_here",
            "tenantId": "Enter_the_Tenant_Info_Here",
