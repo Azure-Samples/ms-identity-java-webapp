@@ -178,7 +178,7 @@ If you would like to deploy the web sample to Tomcat, you will need to make a co
     - This will generate a `msal-web-sample-0.1.0.war` file in your /targets directory.
     - Rename this file to `msal4jsample.war`
     - Deploy this war file using Tomcat or any other J2EE container solution.
-        - To deploy, copy the ROOT.war file to the `/webapps/` directory in your Tomcat installation, and then start the Tomcat server.
+        - To deploy, copy the msal4jsample.war file to the `/webapps/` directory in your Tomcat installation, and then start the Tomcat server.
 
 5. Once deployed, go to https://localhost:8443/msal4jsample in your browser
 

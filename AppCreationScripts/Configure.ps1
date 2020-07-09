@@ -151,7 +151,7 @@ Function ConfigureApplications
    $webappAppKey = $pw
    $webappAadApplication = New-AzureADApplication -DisplayName "java-web-app" `
                                                   -LogoutUrl "http://localhost:44321/signout-oidc" `
-                                                  -ReplyUrls "http://localhost:8080/msal4jsample/secure/aad", "http://localhost:8080/msal4jsample/graph/me" `
+                                                  -ReplyUrls "http://localhost:8443/msal4jsample/secure/aad", "http://localhost:8443/msal4jsample/graph/me" `
                                                   -IdentifierUris "https://$tenantName/java-web-app" `
                                                   -AvailableToOtherTenants $True `
                                                   -PasswordCredentials $key `
