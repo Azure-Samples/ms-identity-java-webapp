@@ -22,11 +22,13 @@ This sample demonstrates a Java web application showcasing how to use spring sec
 1. The Java web application:
 
    - Obtains an Id Token from Azure Active Directory (Azure AD) to sign in an user
-   - uses Spring Security for logging-in an user via OAuth2.0
+   - uses Spring Security for logging-in a user via OAuth2.0
 
 ### Scenario
 
 This sample shows how to build a Java web app that uses OpenId Connect to sign-in/ sign-out an user and to use spring security to sign-in user via OAuth2.0. For more information about how the protocols work in this scenario and other scenarios, see [Authentication Scenarios for Azure AD](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-authentication-scenarios).
+
+> Note: For a Spring web app sample signing in and authorizing access to users in an Azure AD group, refer to this [tutorial using Azure AD Spring Boot Starter](https://docs.microsoft.com/en-us/azure/developer/java/spring-framework/configure-spring-boot-starter-java-app-with-azure-active-directory).
 
 ## How to run this sample
 
