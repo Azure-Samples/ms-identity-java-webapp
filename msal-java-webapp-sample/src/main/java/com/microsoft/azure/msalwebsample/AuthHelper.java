@@ -153,10 +153,9 @@ class AuthHelper {
         httpResponse.sendRedirect(authorizationCodeUrl);
     }
 
-    String getAuthorizationCodeUrl(String claims, String scope, String registeredRedirectURL, String state, String nonce)
-            throws UnsupportedEncodingException {
+    String getAuthorizationCodeUrl(String claims, String scope, String registeredRedirectURL, String state, String nonce) {
 
-        String urlEncodedScopes = scope == null ? "" : URLEncoder.encode(scope, "UTF-8");
+        String urlEncodedScopes = scope == null ? "" : scope;
 
         PublicClientApplication pca = PublicClientApplication.builder(clientId).build();
 
