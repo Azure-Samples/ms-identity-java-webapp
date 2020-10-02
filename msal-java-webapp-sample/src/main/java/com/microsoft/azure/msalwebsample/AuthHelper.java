@@ -155,14 +155,14 @@ class AuthHelper {
 
     String getAuthorizationCodeUrl(String claims, String scope, String registeredRedirectURL, String state, String nonce) {
 
-        String urlEncodedScopes = scope == null ? "" : scope;
+        String updatedScopes = scope == null ? "" : scope;
 
         PublicClientApplication pca = PublicClientApplication.builder(clientId).build();
 
         AuthorizationRequestUrlParameters parameters =
                 AuthorizationRequestUrlParameters
                         .builder(registeredRedirectURL,
-                                Collections.singleton(urlEncodedScopes))
+                                Collections.singleton(updatedScopes))
                         .responseMode(ResponseMode.QUERY)
                         .prompt(Prompt.SELECT_ACCOUNT)
                         .state(state)
