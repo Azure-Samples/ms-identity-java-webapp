@@ -153,11 +153,12 @@ class AuthHelper {
         httpResponse.sendRedirect(authorizationCodeUrl);
     }
 
-    String getAuthorizationCodeUrl(String claims, String scope, String registeredRedirectURL, String state, String nonce) {
+    String getAuthorizationCodeUrl(String claims, String scope, String registeredRedirectURL, String state, String nonce)
+            throws MalformedURLException {
 
         String updatedScopes = scope == null ? "" : scope;
 
-        PublicClientApplication pca = PublicClientApplication.builder(clientId).build();
+        PublicClientApplication pca = PublicClientApplication.builder(clientId).authority(authority).build();
 
         AuthorizationRequestUrlParameters parameters =
                 AuthorizationRequestUrlParameters
