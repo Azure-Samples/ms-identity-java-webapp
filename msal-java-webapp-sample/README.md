@@ -113,9 +113,9 @@ Use keytool utility (included in JRE) if you want to generate self-signed certif
 Example:  
 keytool -genkeypair -alias testCert -keyalg RSA -storetype PKCS12 -keystore keystore.p12 -storepass password
 
-server.ssl.key-store-type=PKCS12  
-server.ssl.key-store=classpath:keystore.p12  
-server.ssl.key-store-password=password  
+server.ssl.key-store-type=PKCS12
+server.ssl.key-store=classpath:keystore.p12
+server.ssl.key-store-password=password
 server.ssl.key-alias=testCert
 ```
 
