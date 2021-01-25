@@ -52,6 +52,9 @@ public class AuthFilter implements Filter {
                     // response should have authentication code, which will be used to acquire access token
                     authHelper.processAuthenticationCodeRedirect(httpRequest, currentUri, fullUrl);
 
+                    // remove query params so that containsAuthenticationCode will not be true on future requests
+                    ((HttpServletResponse) response).sendRedirect(currentUri);
+
                     chain.doFilter(request, response);
                     return;
                 }
