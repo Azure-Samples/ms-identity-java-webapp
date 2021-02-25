@@ -101,23 +101,25 @@ As a first step you'll need to:
 
 ### Step 4:  Configure the sample to use your Azure AD tenant
 
-Open `application.properties` in the src/main/resources folder. Fill in with your tenant and app registration information noted in registration step. Replace *Enter_the_Tenant_Info_Here* with the **Tenant Id**, *Enter_the_Application_Id_here* with the **Application Id** and *Enter_the_Client_Secret_Here* with the **key value** noted.
+Open `application.properties` in the src/main/resources folder.
+1. Fill in your tenant and app registration information noted in registration step. 
+   - Replace `Enter_the_Tenant_Info_Here` with the **Tenant Id**
+   - Replace `Enter_the_Application_Id_here` with the **Application Id**
+   - Replace `Enter_the_Client_Secret_Here` with the **secret key value**
+   
+1. If you did not use the  default redirect URIs, then you'll have to update `aad.redirectUriSignin` and `aad.redirectUriGraph` as well with the registered redirect URIs.
+   - You can use any host and port number, but the path must stay the same (/msal4jsample/secure/aad and /msal4jsample/graph/me) as these are mapped to the controllers that will process the requests.
 
-If you did not use the  default redirect URIs, then you'll have to update `aad.redirectUriSignin` and `aad.redirectUriGraph` as well with the registered redirect URIs.
-> You can use any host and port number, but the path must stay the same (/msal4jsample/secure/aad and /msal4jsample/graph/me) as these are mapped to the controllers that will process the requests.
+1. In order to use HTTPS on localhost, you need to set up a self-signed certificate. 
+ - This terminal command will use Java's keytool utility to create a keystore called `keystore.p12` in the current directory, which is secured using the password `password`, and will create a cert with an alias of `testCert` and add it to the keystore.
 
-In order to use https with localhost fill in server.ssl.key properties.  
-Use keytool utility (included in JRE) if you want to generate self-signed certificate.
+`keytool -genkeypair -alias testCert -keyalg RSA -storetype PKCS12 -keystore keystore.p12 -storepass password`
 
-```
-Example:  
-keytool -genkeypair -alias testCert -keyalg RSA -storetype PKCS12 -keystore keystore.p12 -storepass password
-
-server.ssl.key-store-type=PKCS12
-server.ssl.key-store=classpath:keystore.p12
-server.ssl.key-store-password=password
-server.ssl.key-alias=testCert
-```
+ - Once you have your keystore/certificate, add its info to the SSL keystore properties in `application.properties`.
+    - Replace `Enter_Key_Store_Here` with the path to the keystore.p12 file
+    - Replace `Enter_Key_Store_Password_Here` and `Enter_Key_Password_Here` with the password
+    - Replace `Enter_Key_Store_Type_Here` with the store type (PKCS12)
+    - Replace `Enter_Key_Alias_Here` with the cert's alias
 
 ### Step 5: Run the application
 
