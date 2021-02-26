@@ -63,26 +63,24 @@ In the steps below, "ClientID" is the same as "Application ID" or "AppId".
 
 #### Configure the webapp
 
-1. Open the `resources/application.properties` file
-
+Open the `resources/application.properties` file
+1. Fill in your tenant and app registration information noted in registration step. 
    * Set the values of `b2c.tenant` and `b2c.host` with the name of the Azure AD B2C tenant that you created.
      For example, replace `fabrikamb2c` with `contoso`.
    * Set the value of `b2c.clientId` with the application ID that you recorded.
    * Replace the value of `b2c.secret` with the key that you recorded.
    * Replace the value of `b2c.redirectUri` with `https://localhost:8443/msal4jsample/secure/aad​`.
 
-In order to use https with localhost fill in server.ssl.key properties.  
-Use keytool utility (included in JRE) if you want to generate self-signed certificate.
+1. In order to use HTTPS on localhost, you need to set up a self-signed certificate. 
+ - This terminal command will use Java's keytool utility to create a keystore called `keystore.p12` in the current directory, which is secured using the password `password`, and will create a cert with an alias of `testCert` and add it to the keystore.
 
-```
-Example:  
-keytool -genkeypair -alias testCert -keyalg RSA -storetype PKCS12 -keystore keystore.p12 -storepass password
+`keytool -genkeypair -alias testCert -keyalg RSA -storetype PKCS12 -keystore keystore.p12 -storepass password`
 
-server.ssl.key-store-type=PKCS12  
-server.ssl.key-store=classpath:keystore.p12  
-server.ssl.key-store-password=password  
-server.ssl.key-alias=testCert
-```
+ - Once you have your keystore/certificate, add its info to the SSL keystore properties in `application.properties`.
+    - Replace `Enter_Key_Store_Here` with the path to the keystore.p12 file
+    - Replace `Enter_Key_Store_Password_Here` and `Enter_Key_Password_Here` with the password
+    - Replace `Enter_Key_Store_Type_Here` with the store type (PKCS12)
+    - Replace `Enter_Key_Alias_Here` with the cert's alias
 
 ### Step 5: Run the application
 
