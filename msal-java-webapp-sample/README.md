@@ -62,7 +62,7 @@ To register these projects, you can:
 - or use PowerShell scripts that:
   - **automatically** create for you the Azure AD applications and related objects (passwords, permissions, dependencies)
 
-If you want to use this automation, read the instructions in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md). Please note that the configuration of your code (Step 4) still needs to be done manually.
+If you want to use this automation, read the instructions in [App Creation Scripts](../AppCreationScripts/AppCreationScripts.md). Please note that the configuration of your code (Step 4) still needs to be done manually.
 
 #### First step: choose the Azure AD tenant where you want to create your applications
 
