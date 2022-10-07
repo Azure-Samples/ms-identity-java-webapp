@@ -8,7 +8,7 @@ products:
 description: "This sample demonstrates a Java web application that is secured using Azure Active Directory B2C."
 urlFragment: ms-identity-java-webapp
 ---
-# A Java web appplication with Azure AD B2C
+# A Java web application with Azure AD B2C
 
 ### Overview
 
