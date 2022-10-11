@@ -4,18 +4,18 @@
 package com.microsoft.azure.springsecuritywebapp;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 import java.net.URLEncoder;
 
 
 @Configuration
-@EnableOAuth2Sso
+@EnableWebSecurity
 @Order(value = 0)
 public class AppConfiguration extends WebSecurityConfigurerAdapter {
 
@@ -33,7 +33,7 @@ public class AppConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/", "/login**", "/error**")
                     .permitAll()
                 .anyRequest()
-                    .authenticated()
+                    .authenticated().and().oauth2Login()
                 .and()
                     .logout()
                         .deleteCookies()

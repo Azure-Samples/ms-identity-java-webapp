@@ -84,7 +84,7 @@ As a first step you'll need to:
 1. In the Application menu blade, click on **Authentication**, under **Redirect URIs**, select **Web** and enter the redirect URL.
    By default, the sample uses:
 
-   - `https://localhost:8443/msal4jsample/login`
+   - `https://localhost:8443/login/oauth2/code/`
 
     Click on **save**.
 
@@ -188,28 +188,31 @@ This class extends `WebSecurityConfigurerAdapter` from which the `configure` met
 
 ```Java
 @Configuration
-@EnableOAuth2Sso
+@EnableWebSecurity
 @Order(value = 0)
 public class AppConfiguration extends WebSecurityConfigurerAdapter {
 
-    @Override
-    public void configure(HttpSecurity http) throws Exception {
+   @Autowired
+   private Environment env;
 
-        String logoutUrl = env.getProperty("endSessionEndpoint") + "?post_logout_redirect_uri=" +
-                URLEncoder.encode(env.getProperty("homePage"), "UTF-8");
+   @Override
+   public void configure(HttpSecurity http) throws Exception {
 
-        http.antMatcher("/**")
-                .authorizeRequests()
-                .antMatchers("/", "/login**", "/error**")
-                    .permitAll()
-                .anyRequest()
-                    .authenticated()
-                .and()
-                    .logout()
-                        .deleteCookies()
-                        .invalidateHttpSession(true)
-                        .logoutSuccessUrl(logoutUrl);
-    }
+      String logoutUrl = env.getProperty("endSessionEndpoint") + "?post_logout_redirect_uri=" +
+              URLEncoder.encode(env.getProperty("homePage"), "UTF-8");
+
+      http.antMatcher("/**")
+              .authorizeRequests()
+              .antMatchers("/", "/login**", "/error**")
+              .permitAll()
+              .anyRequest()
+              .authenticated().and().oauth2Login()
+              .and()
+              .logout()
+              .deleteCookies()
+              .invalidateHttpSession(true)
+              .logoutSuccessUrl(logoutUrl);
+   }
 }
 ```
 
