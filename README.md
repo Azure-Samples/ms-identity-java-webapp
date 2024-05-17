@@ -1,13 +1,9 @@
-# A group of web authentication samples using OpenId Connect and the Microsoft Identity platform
+# ms-identity-java-webapp
 
-## About these samples
+This sample has been archived and is no longer being maintained. You can find a more recent version of this sample [here](https://github.com/Azure-Samples/ms-identity-docs-code-java)
 
-### Overview
+For access to the project files, please visit the branch `archive`.
 
-Three samples are available:
-1. Java web application using the MSAL4J to sign in users with Azure AD
-    - Source code can be found in the [msal-java-webapp-sample](msal-java-webapp-sample) directory, as well as the [README](msal-java-webapp-sample/README.md) for configuring and running the sample
-1. A Java web application using Spring Security to sign in users with Azure AD
-    - Source code can be found in the [spring-security-web-app](spring-security-web-app) directory, as well as the [README](spring-security-web-app/README.md) for configuring and running the sample
-1. A Java web application using the MSAL4J to sign in users Azure AD B2C
-    - Source code can be found in the [msal-b2c-web-sample](msal-b2c-web-sample) directory, as well as the [README](msal-b2c-web-sample/README.md) for configuring and running the sample
+## Disclaimer
+
+The sample in this repository is no longer maintained and is kept for historical reasons. The sample in the main branch is not guaranteed to work with the latest versions of the libraries it depends on.
